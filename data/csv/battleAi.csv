@@ -1,0 +1,4 @@
+//编号,地图编号,回合总数,手牌总数,初始英雄,AI编号列表(对应ai.csv中的id)
+id,mapID,roundNum,cardsNum,defaultHeros,ai
+int,int,int,int,int[][],int[]
+1,5,10,10,,1

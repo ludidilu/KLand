@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with TexturePacker http://www.codeandweb.com/texturepacker-->
+<!-- $TexturePacker:SmartUpdate:2e710bce5a5bff7816a39a2c5554d027:f7edd633e49b8d5097023173c6514937:f6867fb63e87c083f81dcf503f7ab8ad$ -->
+<TextureAtlas imagePath="public.png">
+    <SubTexture name="actionFrame" x="545" y="2" width="68" height="84"/>
+    <SubTexture name="blackFrame" x="2" y="2" width="90" height="103"/>
+    <SubTexture name="greenArrow" x="615" y="2" width="66" height="30"/>
+    <SubTexture name="greenBg" x="278" y="2" width="87" height="100"/>
+    <SubTexture name="greenFrame" x="94" y="2" width="90" height="103"/>
+    <SubTexture name="redArrow" x="615" y="34" width="66" height="30"/>
+    <SubTexture name="redBg" x="367" y="2" width="87" height="100"/>
+    <SubTexture name="redFrame" x="186" y="2" width="90" height="103"/>
+    <SubTexture name="whiteBg" x="456" y="2" width="87" height="100"/>
+    <SubTexture name="yellowArrow" x="615" y="66" width="66" height="30"/>
+</TextureAtlas>

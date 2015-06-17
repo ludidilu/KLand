@@ -1,0 +1,26 @@
+//通讯编号,调用方法,参数类型,类型(0代表客户端向服务器发包 1代表服务器回包 2代表服务器向客户端发包),注释
+id,methodName,arg,type,comment
+int,str,str[],int,str
+999,pushMsg,str,2,服务器主动推送信息
+-1,logout,,2,被踢下线
+0,login,str$str,0,登录
+1,loginOK,boo,1,登录是否成功
+2,getUserData,,0,申请获取玩家数据
+3,getUserDataOK,boo$int[],1,获取玩家数据成功
+4,enterQueue,,0,申请加入战斗队列
+5,enterQueueOK,boo,1,加入战斗队列成功
+6,quitQueue,,0,申请离开战斗队列
+7,quitQueueOK,boo,1,离开战斗队列成功
+8,enterBattle,,2,进入战斗
+9,getBattleData,,0,获取战斗数据
+10,getBattleDataOK,boo$int$int$int$int[]$int[][]$int$int$int$int[][]$int[]$boo$int[][]$int[][],1,获取战斗数据成功
+11,sendBattleAction,int[][]$int[][],0,发送战斗动作
+12,sendBattleActionOK,boo,1,发送战斗动作成功
+13,playBattle,int[][]$int[][]$int[][]$int[][][]$int[][][]$int$int$int$int[],2,播放战斗动画
+14,fightAi,,0,申请加入AI战斗队列
+15,fightAiOK,boo,1,申请加入AI战斗队列成功
+16,quitAi,,0,申请离开AI战斗队列
+17,quitAiOK,boo,1,离开AI战斗队列成功
+18,quitBattle,,0,申请退出战斗
+19,quitBattleOK,boo,1,申请退出战斗成功
+20,leaveBattle,int,2,退出了战斗
