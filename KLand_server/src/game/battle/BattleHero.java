@@ -16,7 +16,6 @@ public class BattleHero {
 	public boolean isJustSummon = false;
 	public boolean moved = false;
 	public boolean isSilent = false;
-	public boolean isStopMove = false;
 	
 	public int atkFix = 0;
 	public int maxHpFix = 0;

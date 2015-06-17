@@ -42,21 +42,11 @@ public class Battle extends SuperService{
 	private static int MAX_CARDS_NUM = 5;
 	private static int MONEY = 5;
 	public static int POWER_CAN_MOVE = 1;
-	public static int MAX_MOVE_HERO_NUM = 3;
 	
 	private UserService service1;
 	private UserService service2;
 	
-	private boolean isActioned1;
-	private boolean isActioned2;
-	
-	private ArrayList<Integer> canMoveHeroArr = new ArrayList<>();
-	
-	private HashMap<Integer, Integer> moveData1 = new HashMap<>();
-	private HashMap<Integer, Integer> moveData2 = new HashMap<>();
-	
-	private HashMap<Integer, Integer> summonData1 = new HashMap<>();
-	private HashMap<Integer, Integer> summonData2 = new HashMap<>();
+	private boolean actionState = true;
 	
 	private int mapID;
 	private MapUnit mapUnit;
@@ -174,62 +164,6 @@ public class Battle extends SuperService{
 					hero.power = hero.csv.maxPower;
 					
 					heroMap.put(pos, hero);
-				}
-				
-				ArrayList<Integer> moveHero1 = new ArrayList<>();
-				ArrayList<Integer> moveHero2 = new ArrayList<>();
-				
-				Iterator<BattleHero> iter = heroMap.values().iterator();
-				
-				while(iter.hasNext()){
-					
-					BattleHero hero = iter.next();
-					
-					if(hero.csv.heroType.moveType != 0){
-						
-						if(hero.isHost){
-							
-							moveHero1.add(hero.pos);
-							
-						}else{
-							
-							moveHero2.add(hero.pos);
-						}
-					}
-				}
-				
-				if(moveHero1.size() > 0){
-					
-					if(moveHero1.size() > MAX_MOVE_HERO_NUM){
-						
-						moveHero1 = PublicTools.getSomeOfArr(moveHero1, MAX_MOVE_HERO_NUM);
-					}
-				
-					Iterator<Integer> iter2 = moveHero1.iterator();
-					
-					while(iter2.hasNext()){
-						
-						int pos = iter2.next();
-						
-						canMoveHeroArr.add(pos);
-					}
-				}
-				
-				if(moveHero2.size() > 0){
-					
-					if(moveHero2.size() > MAX_MOVE_HERO_NUM){
-						
-						moveHero2 = PublicTools.getSomeOfArr(moveHero2, MAX_MOVE_HERO_NUM);
-					}
-				
-					Iterator<Integer> iter2 = moveHero2.iterator();
-					
-					while(iter2.hasNext()){
-						
-						int pos = iter2.next();
-						
-						canMoveHeroArr.add(pos);
-					}
 				}
 			}
 		}
@@ -354,129 +288,26 @@ public class Battle extends SuperService{
 		
 		boolean isHost = _service == service1;
 		
-		boolean isActioned;
-		
-		HashMap<Integer, Integer> moveMap = null;
-		HashMap<Integer, Integer> summonMap = null;
-		int[][] moveData = null;
-		int[][] summonData = null;
-		
-		if(isHost){
-			
-			isActioned = isActioned1;
-			moveMap = moveData1;
-			summonMap = summonData1;
-			
-		}else{
-			
-			isActioned = isActioned2;
-			moveMap = moveData2;
-			summonMap = summonData2;
-		}
-		
-		if(isActioned){
-			
-			if(!moveMap.isEmpty()){
-				
-				moveData = new int[moveMap.size()][];
-				
-				iter = moveMap.entrySet().iterator();
-				
-				index = 0;
-				
-				while(iter.hasNext()){
-					
-					Entry<Integer, Integer> entry = iter.next();
-					
-					moveData[index] = new int[]{entry.getKey(),entry.getValue()};
-					
-					index++;
-				}
-			}
-			
-			if(!summonMap.isEmpty()){
-				
-				summonData = new int[summonMap.size()][];
-				
-				iter = summonMap.entrySet().iterator();
-				
-				index = 0;
-				
-				while(iter.hasNext()){
-					
-					Entry<Integer, Integer> entry = iter.next();
-					
-					summonData[index] = new int[]{entry.getKey(),entry.getValue()};
-					
-					index++;
-				}
-			}
-		}
-		
-		int[] canMoveData = null;
-		
-		if(canMoveHeroArr.size() > 0){
-			
-			canMoveData = new int[canMoveHeroArr.size()];
-			
-			index = 0;
-			
-			for(int uid : canMoveHeroArr){
-				
-				canMoveData[index] = uid;
-				
-				index++;
-			}
-		}
-		
-		_service.process("getBattleDataOK", isHost, nowRound, maxRound, mapID, mapData, cardsData, oppCardsNum, userAllCards1.size(), userAllCards2.size(), heroData, canMoveData, isActioned, moveData, summonData);
+		_service.process("getBattleDataOK", isHost, nowRound, maxRound, mapID, mapData, cardsData, oppCardsNum, userAllCards1.size(), userAllCards2.size(), heroData, actionState);
 	}
 	
 	public void sendBattleAction(UserService _service, int[][] _moveData, int[][] _summonData){
 		
 		boolean isHost = _service == service1;
 		
-		HashMap<Integer, Integer> moveData;
-		HashMap<Integer, Integer> summonData;
-		
-		if(isHost){
+		if(isHost != actionState){
 			
-			if(isActioned1){
-				
-				_service.process("sendMsg", "BattleError 0");
-				
-				_service.process("sendBattleActionOK", false);
-				
-				return;
-				
-			}else{
-				
-				isActioned1 = true;
-			}
+			_service.process("sendMsg", "sendBattleAction error!");
 			
-			moveData = moveData1;
-			summonData = summonData1;
-			
-		}else{
-			
-			if(isActioned2){
-				
-				_service.process("sendMsg", "BattleError 0");
-				
-				_service.process("sendBattleActionOK", false);
-				
-				return;
-				
-			}else{
-				
-				isActioned2 = true;
-			}
-			
-			moveData = moveData2;
-			summonData = summonData2;
+			return;
 		}
 		
+		HashMap<Integer, Integer> moveData = null;
+		HashMap<Integer, Integer> summonData = null;
+		
 		if(_moveData != null){
+			
+			moveData = new HashMap<>();
 			
 			for(int i = 0 ; i < _moveData.length ; i++){
 				
@@ -486,6 +317,8 @@ public class Battle extends SuperService{
 		
 		if(_summonData != null){
 			
+			summonData = new HashMap<>();
+			
 			for(int i = 0 ; i < _summonData.length ; i++){
 				
 				summonData.put(_summonData[i][0], _summonData[i][1]);
@@ -494,103 +327,117 @@ public class Battle extends SuperService{
 		
 		_service.process("sendBattleActionOK", true);
 		
-		if(service2 == null){
-
-			BattleAI.start(service1,mapUnit,map,heroMap,userCards2,canMoveHeroArr,aiMoney,summonData2,moveData2);
-			
-			isActioned2 = true;
-		}
+//		if(service2 == null){
+//
+//			BattleAI.start(service1,mapUnit,map,heroMap,userCards2,canMoveHeroArr,aiMoney,summonData2,moveData2);
+//			
+//			isActioned2 = true;
+//		}
 		
-		if(isActioned1 && isActioned2){
+
+		battleStart(summonData,moveData);
+		
+		actionState = !actionState;
+		
+		nowRound++;
+		
+		if(nowRound > maxRound){
 			
-			isActioned1 = isActioned2 = false;
-			
-			battleStart();
-			
-			nowRound++;
-			
-			if(nowRound > maxRound){
+			if(score1 > score2){
 				
-				if(score1 > score2){
+				service1.process("leaveBattle", 1);
+				
+				if(service2 != null){
 					
-					service1.process("leaveBattle", 1);
-					
-					if(service2 != null){
-						
-						service2.process("leaveBattle", 2);
-					}
-					
-				}else if(score1 < score2){
-					
-					service1.process("leaveBattle", 2);
-					
-					if(service2 != null){
-					
-						service1.process("leaveBattle", 1);
-					}
-					
-				}else{
-					
-					service1.process("leaveBattle", 3);
-					
-					if(service2 != null){
-					
-						service1.process("leaveBattle", 3);
-					}
+					service2.process("leaveBattle", 2);
+				}
+				
+			}else if(score1 < score2){
+				
+				service1.process("leaveBattle", 2);
+				
+				if(service2 != null){
+				
+					service2.process("leaveBattle", 1);
+				}
+				
+			}else{
+				
+				service1.process("leaveBattle", 3);
+				
+				if(service2 != null){
+				
+					service2.process("leaveBattle", 3);
+				}
+			}
+			
+			battleOver();
+			
+		}else{
+			
+			if(score1 == 0){
+				
+				service1.process("leaveBattle", 2);
+				
+				if(service2 != null){
+				
+					service2.process("leaveBattle", 1);
 				}
 				
 				battleOver();
 				
-			}else{
+			}else if(score2 == 0){
 				
-				if(score1 == 0){
-					
-					service1.process("leaveBattle", 2);
-					
-					if(service2 != null){
-					
-						service1.process("leaveBattle", 1);
-					}
-					
-					battleOver();
-					
-				}else if(score2 == 0){
-					
-					service1.process("leaveBattle", 1);
-					
-					if(service2 != null){
-					
-						service1.process("leaveBattle", 2);
-					}
-					
-					battleOver();
+				service1.process("leaveBattle", 1);
+				
+				if(service2 != null){
+				
+					service2.process("leaveBattle", 2);
 				}
+				
+				battleOver();
 			}
 		}
+		
 	}
 	
-	private void battleStart(){
+	private void battleStart(HashMap<Integer, Integer> _summonData, HashMap<Integer, Integer> _moveData){
 		
-		int money1 = MONEY;
+		HashMap<Integer, Integer> userCards;
+		HashMap<Integer, Integer> oppUserCards;
+		ArrayList<Integer> oppAllUserCards;
+		UserService service;
+		UserService oppService;
+		int mapState;
 		
-		int money2;
-		
-		if(service2 != null){
-		
-			money2 = MONEY;
+		if(actionState){
+			
+			userCards = userCards1;
+			oppUserCards = userCards2;
+			oppAllUserCards = userAllCards2;
+			service = service1;
+			oppService = service2;
+			mapState = 1;
 			
 		}else{
 			
-			money2 = aiMoney;
+			userCards = userCards2;
+			oppUserCards = userCards1;
+			oppAllUserCards = userAllCards1;
+			service = service2;
+			oppService = service1;
+			mapState = 2;
 		}
 		
-		int[][] summonResult1 = null;
+		int money = MONEY;
 		
-		if(!summonData1.isEmpty()){
+		int[][] summonResult = null;
+		
+		if(_summonData != null){
 			
-			ArrayList<int[]> summonArr1 = null;
+			ArrayList<int[]> summonArr = null;
 			
-			Iterator<Entry<Integer, Integer>> iter = summonData1.entrySet().iterator();
+			Iterator<Entry<Integer, Integer>> iter = _summonData.entrySet().iterator();
 			
 			while(iter.hasNext()){
 				
@@ -599,52 +446,52 @@ public class Battle extends SuperService{
 				int uid = entry.getKey();
 				int pos = entry.getValue();
 				
-				if(!userCards1.containsKey(uid)){
+				if(!userCards.containsKey(uid)){
 					
-					service1.process("sendMsg", "BattleError 1");
+					service.process("sendMsg", "BattleError 1");
 					
 					continue;
 				}
 				
-				int cardID = userCards1.get(uid);
+				int cardID = userCards.get(uid);
 				
 				Csv_hero heroCsv = Csv_hero.dic.get(cardID);
 				
-				if(heroCsv.star > money1){
+				if(heroCsv.star > money){
 					
-					service1.process("sendMsg", "BattleError 2");
+					service.process("sendMsg", "BattleError 2");
 					
 					continue;
 				}
 				
 				if(!map.containsKey(pos)){
 					
-					service1.process("sendMsg", "BattleError 3");
+					service.process("sendMsg", "BattleError 3");
 					
 					continue;
 				}
 				
-				if(map.get(pos) == 2){
+				if(map.get(pos) != mapState){
 					
-					service1.process("sendMsg", "BattleError 4");
+					service.process("sendMsg", "BattleError 4");
 					
 					continue;
 				}
 				
 				if(heroMap.containsKey(pos)){
 					
-					service1.process("sendMsg", "BattleError 5");
+					service.process("sendMsg", "BattleError 5");
 					
 					continue;
 				}
 				
-				userCards1.remove(uid);
+				userCards.remove(uid);
 				
 				BattleHero hero = new BattleHero();
 				
 				hero.csv = heroCsv;
 				
-				hero.isHost = true;
+				hero.isHost = actionState;
 				
 				hero.pos = pos;
 				
@@ -656,139 +503,45 @@ public class Battle extends SuperService{
 				
 				heroMap.put(pos, hero);
 				
-				money1 = money1 - heroCsv.star;
+				money = money - heroCsv.star;
 				
-				if(summonArr1 == null){
+				if(summonArr == null){
 					
-					summonArr1 = new ArrayList<>();
+					summonArr = new ArrayList<>();
 				}
 				
-				summonArr1.add(new int[]{uid,cardID,pos});
+				summonArr.add(new int[]{uid,cardID,pos});
 			}
 			
-			summonData1.clear();
-			
-			if(summonArr1 != null){
+			if(summonArr != null){
 				
-				summonResult1 = new int[summonArr1.size()][];
+				summonResult = new int[summonArr.size()][];
 				
-				summonArr1.toArray(summonResult1);
-			}
-		}
-		
-		int[][] summonResult2 = null;
-		
-		if(!summonData2.isEmpty()){
-			
-			ArrayList<int[]> summonArr2 = null;
-			
-			Iterator<Entry<Integer, Integer>> iter = summonData2.entrySet().iterator();
-			
-			while(iter.hasNext()){
-				
-				Entry<Integer, Integer> entry = iter.next();
-				
-				int uid = entry.getKey();
-				int pos = entry.getValue();
-				
-				if(service2 != null && !userCards2.containsKey(uid)){
-					
-					service2.process("sendMsg", "BattleError 1");
-					
-					continue;
-				}
-				
-				int cardID = userCards2.get(uid);
-				
-				Csv_hero heroCsv = Csv_hero.dic.get(cardID);
-				
-				if(service2 != null && heroCsv.star > money2){
-					
-					service2.process("sendMsg", "BattleError 2");
-					
-					continue;
-				}
-				
-				if(service2 != null && !map.containsKey(pos)){
-					
-					service2.process("sendMsg", "BattleError 3");
-					
-					continue;
-				}
-				
-				if(service2 != null && map.get(pos) == 1){
-					
-					service2.process("sendMsg", "BattleError 4");
-					
-					continue;
-				}
-				
-				if(service2 != null && heroMap.containsKey(pos)){
-					
-					service2.process("sendMsg", "BattleError 5");
-					
-					continue;
-				}
-				
-				userCards2.remove(uid);
-				
-				BattleHero hero = new BattleHero();
-				
-				hero.csv = heroCsv;
-				
-				hero.isHost = false;
-				
-				hero.pos = pos;
-				
-				hero.hp = heroCsv.maxHp;
-				
-				hero.power = heroCsv.maxPower;
-				
-				hero.isJustSummon = true;
-				
-				heroMap.put(pos, hero);
-				
-				money2 = money2 - heroCsv.star;
-				
-				if(summonArr2 == null){
-					
-					summonArr2 = new ArrayList<>();
-				}
-				
-				summonArr2.add(new int[]{uid,cardID,pos});
-			}
-			
-			summonData2.clear();
-			
-			if(summonArr2 != null){
-				
-				summonResult2 = new int[summonArr2.size()][];
-				
-				summonArr2.toArray(summonResult2);
+				summonArr.toArray(summonResult);
 			}
 		}
 		
 		//----检测移动合法性----
 		int[][] moveResult = null;
 		
-		if(!moveData1.isEmpty()){
+		if(_moveData != null){
 			
-			Iterator<Entry<Integer, Integer>> iter = moveData1.entrySet().iterator();
+			Iterator<Entry<Integer, Integer>> iter = _moveData.entrySet().iterator();
 			
 			while(iter.hasNext()){
 				
 				Entry<Integer, Integer> entry = iter.next();
 				
-				if(money1 < 1){
+				if(money < 1){
 					
-					service1.process("sendMsg", "BattleError 11");
+					service.process("sendMsg", "BattleError 11");
 					
 					iter.remove();
 					
 					continue;
 				}
 				
-				money1 = money1 - 1;
+				money = money - 1;
 				
 				int pos = entry.getKey();
 				int direct = entry.getValue();
@@ -797,91 +550,25 @@ public class Battle extends SuperService{
 				
 				if(hero == null){
 					
-					service1.process("sendMsg", "BattleError 6");
+					service.process("sendMsg", "BattleError 6");
 					
 					iter.remove();
 					
 					continue;
 				}
 				
-				if(!hero.isHost){
+				if(hero.isHost != actionState){
 					
-					service1.process("sendMsg", "BattleError 7");
-					
-					iter.remove();
-					
-					continue;
-				}
-				
-				if(!canMoveHeroArr.contains(hero.pos)){
-					
-					service1.process("sendMsg", "BattleError 8");
-					
-					iter.remove();
-					
-					continue;
-				}
-
-				int targetPos = mapUnit.neighbourPosMap.get(pos)[direct];
-				
-				if(targetPos != -1){
-					
-					entry.setValue(targetPos);
-					
-				}else{
-					
-					service1.process("sendMsg", "BattleError 9");
-					
-					iter.remove();
-				}
-			}
-		}
-		
-		if(!moveData2.isEmpty()){
-			
-			Iterator<Entry<Integer, Integer>> iter = moveData2.entrySet().iterator();
-			
-			while(iter.hasNext()){
-				
-				Entry<Integer, Integer> entry = iter.next();
-				
-				if(service2 != null && money2 < 1){
-					
-					service2.process("sendMsg", "BattleError 11");
+					service.process("sendMsg", "BattleError 7");
 					
 					iter.remove();
 					
 					continue;
 				}
 				
-				money2 = money2 - 1;
-				
-				int pos = entry.getKey();
-				int direct = entry.getValue();
-				
-				BattleHero hero = heroMap.get(pos);
-				
-				if(service2 != null && hero == null){
+				if(hero.isJustSummon || hero.power < POWER_CAN_MOVE){
 					
-					service2.process("sendMsg", "BattleError 6");
-					
-					iter.remove();
-					
-					continue;
-				}
-				
-				if(service2 != null && hero.isHost){
-					
-					service2.process("sendMsg", "BattleError 7");
-					
-					iter.remove();
-					
-					continue;
-				}
-				
-				if(service2 != null && !canMoveHeroArr.contains(hero.pos)){
-					
-					service2.process("sendMsg", "BattleError 8");
+					service.process("sendMsg", "BattleError 8");
 					
 					iter.remove();
 					
@@ -896,55 +583,7 @@ public class Battle extends SuperService{
 					
 				}else{
 					
-					service2.process("sendMsg", "BattleError 9");
-					
-					iter.remove();
-				}
-			}
-		}
-		
-		canMoveHeroArr.clear();
-		//--------
-		
-		//----检测2边对撞单位以及敌我互换位置单位----
-		if(!moveData1.isEmpty() && !moveData2.isEmpty()){
-			
-			Iterator<Entry<Integer, Integer>> iter = moveData1.entrySet().iterator();
-			
-			while(iter.hasNext()){
-				
-				Entry<Integer, Integer> entry = iter.next();
-				
-				int pos = entry.getKey();
-				int target = entry.getValue();
-				
-				if(map.get(target) == 2 && moveData2.containsValue(target)){
-				
-					iter.remove();
-					
-					continue;
-				}
-				
-				if(moveData2.containsKey(target)){
-					
-					int tmpTarget = moveData2.get(target);
-					
-					if(tmpTarget == pos){
-						
-						iter.remove();
-						
-						moveData2.remove(target);
-					}
-				}
-			}
-			
-			Iterator<Integer> iter2 = moveData2.values().iterator();
-			
-			while(iter2.hasNext()){
-				
-				int target = iter2.next();
-				
-				if(map.get(target) == 1 && moveData1.containsValue(target)){
+					service.process("sendMsg", "BattleError 9");
 					
 					iter.remove();
 				}
@@ -953,18 +592,14 @@ public class Battle extends SuperService{
 		//--------
 		
 		//----真正开始移动了----
-		moveData1.putAll(moveData2);
-		
-		moveData2.clear();
-		
-		if(!moveData1.isEmpty()){
+		if(_moveData != null){
 			
 			ArrayList<Integer> resultPosArr = new ArrayList<>();
 			ArrayList<Integer> resultTargetArr = new ArrayList<>();
 			
 			ArrayList<Integer> checkedPosArr = new ArrayList<>(); 
 		
-			Iterator<Integer> iter = moveData1.keySet().iterator();
+			Iterator<Integer> iter = _moveData.keySet().iterator();
 			
 			while(iter.hasNext()){
 				
@@ -985,11 +620,11 @@ public class Battle extends SuperService{
 				
 				while(true){
 					
-					target = moveData1.get(pos);
+					target = _moveData.get(pos);
 					
 					if(heroMap.containsKey(target)){
 						
-						if(moveData1.containsKey(target)){
+						if(_moveData.containsKey(target)){
 							
 							int index = tmpArr.indexOf(target);
 							
@@ -1007,21 +642,16 @@ public class Battle extends SuperService{
 								
 							}else{
 								
-								if(map.get(pos) == 1){
+								service.process("sendMsg", "BattleError 10");
 									
-									service1.process("sendMsg", "BattleError 10");
-									
-								}else{
-									
-									service2.process("sendMsg", "BattleError 10");
-								}
-								
 								result = false;
 								
 								break;
 							}
 							
 						}else{
+							
+							service.process("sendMsg", "BattleError 11");
 							
 							result = false;
 							
@@ -1045,7 +675,7 @@ public class Battle extends SuperService{
 					while(iter2.hasNext()){
 						
 						pos = iter2.next();
-						target = moveData1.get(pos);
+						target = _moveData.get(pos);
 						
 						BattleHero hero = heroMap.remove(pos);
 						
@@ -1100,8 +730,6 @@ public class Battle extends SuperService{
 				}
 			}
 			
-			moveData1.clear();
-			
 			moveResult = new int[resultPosArr.size()][];
 			
 			for(int i = 0 ; i < resultPosArr.size() ; i++){
@@ -1122,12 +750,7 @@ public class Battle extends SuperService{
 		while(iter.hasNext()){
 
 			BattleHero hero = iter.next();
-			
-			if(hero.isStopMove){//在上个回合结束时再遍历一次数组重置定身属性不太合算  所以在这里重置定身属性
-				
-				hero.isStopMove = false;
-			}
-			
+
 			if(hero.isJustSummon || hero.power == 0 || hero.csv.silentSkillIndexArr == null){
 				
 				continue;
@@ -1386,9 +1009,6 @@ public class Battle extends SuperService{
 		//--------
 		
 		//----重置英雄数据----
-		ArrayList<BattleHero> moveHero1 = new ArrayList<>();
-		ArrayList<BattleHero> moveHero2 = new ArrayList<>();
-		
 		iter = heroMap.values().iterator();
 		
 		while(iter.hasNext()){
@@ -1453,152 +1073,50 @@ public class Battle extends SuperService{
 			if(hero.moved){
 				
 				hero.moved = false;
+			}
+			
+			if(!hero.hasLosePower){
 				
-				if(hero.csv.heroType.moveType == 2){
-					
-					if(hero.isHost){
-						
-						moveHero1.add(hero);
-						
-					}else{
-						
-						moveHero2.add(hero);
-					}
+				if(hero.power < hero.csv.maxPower){
+				
+					hero.power++;
 				}
 				
 			}else{
 				
-				if(hero.csv.heroType.moveType != 0){
-				
-					if(hero.isHost){
-					
-						moveHero1.add(hero);
-						
-					}else{
-						
-						moveHero2.add(hero);
-					}
-				}
-			}
-			
-			if(!hero.hasLosePower && hero.power < hero.csv.maxPower){
-				
-				hero.power++;
+				hero.hasLosePower = false;
 			}
 			
 			hero.atkFix = hero.maxHpFix = 0;
-			
-			hero.hasLosePower = false;
 		}
 		
-		if(moveHero1.size() > 0){
-			
-			if(moveHero1.size() > MAX_MOVE_HERO_NUM){
-				
-				moveHero1 = PublicTools.getSomeOfArr(moveHero1, MAX_MOVE_HERO_NUM);
-			}
+		int cardUid = -1;
+		int cardID = -1;
 		
-			iter = moveHero1.iterator();
+		if(oppAllUserCards.size() > 0){
 			
-			while(iter.hasNext()){
-				
-				BattleHero hero = iter.next();
-				
-				if(hero.power < POWER_CAN_MOVE || hero.isStopMove){
-					
-					iter.remove();
-					
-				}else{
-					
-					canMoveHeroArr.add(hero.pos);
-				}
-			}
-		}
-		
-		if(moveHero2.size() > 0){
+			cardID = oppAllUserCards.remove(0);
 			
-			if(moveHero2.size() > MAX_MOVE_HERO_NUM){
-				
-				moveHero2 = PublicTools.getSomeOfArr(moveHero2, MAX_MOVE_HERO_NUM);
-			}
-		
-			iter = moveHero2.iterator();
-			
-			while(iter.hasNext()){
-				
-				BattleHero hero = iter.next();
-				
-				if(hero.power < POWER_CAN_MOVE || hero.isStopMove){
-					
-					iter.remove();
-					
-				}else{
-					
-					canMoveHeroArr.add(hero.pos);
-				}
-			}
-		}
-		
-		int[] canMoveData = null;
-		
-		if(canMoveHeroArr.size() > 0){
-			
-			canMoveData = new int[canMoveHeroArr.size()];
-			
-			int index = 0;
-			
-			for(int uid : canMoveHeroArr){
-				
-				canMoveData[index] = uid;
-				
-				index++;
-			}
-		}
-		
-		int cardUid1 = -1;
-		int cardID1 = -1;
-		
-		if(userAllCards1.size() > 0){
-			
-			cardID1 = userAllCards1.remove(0);
-			
-			if(userCards1.size() < MAX_CARDS_NUM){
+			if(oppUserCards.size() < MAX_CARDS_NUM){
 
-				cardUid1 = getUid();
+				cardUid = getUid();
 				
-				userCards1.put(cardUid1, cardID1);
-			}
-		}
-		
-		int cardUid2 = -1;
-		int cardID2 = -1;
-		
-		if(userAllCards2.size() > 0){
-			
-			cardID2 = userAllCards2.remove(0);
-			
-			if(userCards2.size() < MAX_CARDS_NUM){
-
-				cardUid2 = getUid();
-				
-				userCards2.put(cardUid2, cardID2);
+				oppUserCards.put(cardUid, cardID);
 			}
 		}
 		//--------
 		
-		service1.process("playBattle", summonResult1, summonResult2, moveResult, skillResult, attackResult, cardUid1, cardID1, cardUid2 == -1 ? cardID2 : -1, canMoveData);
+		service.process("playBattle", summonResult, moveResult, skillResult, attackResult, cardUid, cardUid == -1 ? cardID : -1);
 		
-		if(service2 != null){
+		if(oppService != null){
 		
-			service2.process("playBattle", summonResult1, summonResult2, moveResult, skillResult, attackResult, cardUid2, cardID2, cardUid1 == -1 ? cardID1 : -1, canMoveData);
+			oppService.process("playBattle", summonResult, moveResult, skillResult, attackResult, cardUid, cardID);
 		}
 	}
 	
 	public void battleOver(){
 		
-		canMoveHeroArr.clear();
-		
-		isActioned1 = isActioned2 = false;
+		actionState = true;
 		
 		service1 = null;
 		

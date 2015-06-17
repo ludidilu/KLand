@@ -82,7 +82,6 @@ package game.battle
 		private var nowRound:int;
 		private var maxRound:int;
 		
-		internal var canMoveData:Vector.<int>;
 		private var myCards:Vector.<BattleCard>;
 		
 		internal var heroData:Dictionary;
@@ -278,17 +277,20 @@ package game.battle
 			alertContainer.addEventListener(TouchEvent.TOUCH,alertContainerBeTouch);
 		}
 		
-		public function start(_isHost:Boolean,_nowRound:int,_maxRound:int,_mapID:int,_mapData:Vector.<int>,_myCards:Vector.<Vector.<int>>,_oppCardsNum:int,_userAllCardsNum1:int,_userAllCardsNum2:int,_heroData:Vector.<Vector.<int>>,_canMoveData:Vector.<int>,_isActioned:Boolean,_actionHeroData:Vector.<Vector.<int>>,_actionSummonData:Vector.<Vector.<int>>):void{
+		public function start(_isHost:Boolean,_nowRound:int,_maxRound:int,_mapID:int,_mapData:Vector.<int>,_myCards:Vector.<Vector.<int>>,_oppCardsNum:int,_userAllCardsNum1:int,_userAllCardsNum2:int,_heroData:Vector.<Vector.<int>>,_isActioned:Boolean):void{
 			
 			Starling.current.nativeStage.addEventListener(MouseEvent.MOUSE_WHEEL,onMouseWheel);
 			
 			isHost = _isHost;
+			
+			isActioned = isHost != _isActioned;
+			
+			actionBt.enabled = !isActioned;
+			
 			mapUnit = Map.getMap(_mapID);
 			
 			nowRound = _nowRound;
 			maxRound = _maxRound;
-			
-			canMoveData = _canMoveData;
 			
 			mapData = new Dictionary;
 			
@@ -420,52 +422,7 @@ package game.battle
 				}
 			}
 			
-			isActioned = _isActioned;
 			
-			if(isActioned){
-				
-				if(_actionHeroData != null){
-				
-					for(i = 0 ; i < _actionHeroData.length ; i++){
-						
-						pos = _actionHeroData[i][0];
-						var target:int = BattlePublic.getTargetPos(mapUnit.mapWidth,pos,_actionHeroData[i][1]);
-						
-						moveDic[pos] = target;
-					}
-					
-					money = money - _actionHeroData.length;
-					
-					refreshMoneyTf();
-				}
-				
-				if(_actionSummonData != null){
-					
-					for(i = 0 ; i < _actionSummonData.length ; i++){
-						
-						var uid:int = _actionSummonData[i][0];
-						target = _actionSummonData[i][1];
-						
-						for(var m:int = 0 ; m < myCards.length ; m++){
-							
-							if(myCards[m].uid == uid){
-								
-								nowChooseCard = myCards[m];
-								
-								break;
-							}
-						}
-						
-						summon(target);
-					}
-					
-					nowChooseCard = null;
-				}
-				
-				refreshMove();
-				
-				actionBt.enabled = false;
-			}
 		}
 		
 		private function refreshCards():void{
@@ -813,13 +770,9 @@ package game.battle
 				
 				var sp:Sprite = new Sprite;
 				
-				if(moveResultDic[str] == 0){
+				if(moveResultDic[str]){
 					
 					var picName:String = "greenArrow";
-					
-				}else if(moveResultDic[str] == 1){
-					
-					picName = "yellowArrow";
 					
 				}else{
 					
@@ -864,13 +817,13 @@ package game.battle
 			
 			for each(var target:int in moveDic){
 				
-				if(targetDic[target] == null){
-					
-					targetDic[target] = 1;
+				if(target in targetDic){
+				
+					targetDic[target] = false;
 					
 				}else{
 					
-					targetDic[target] = 2;
+					targetDic[target] = true;
 				}
 			}
 			
@@ -878,46 +831,30 @@ package game.battle
 				
 				target = moveDic[str];
 				
-				if(targetDic[target] == 2){
+				if(!targetDic[target]){
 					
-					moveResultDic[str] = 2;
+					moveResultDic[str] = false;
 					
 				}else if(summonDic[target] != null){
 					
-					if(moveDic[target] == null){
-						
-						moveResultDic[str] = 2;
-					}
-					
-				}else if(mapData[target] == 2){
-					
-					var hero:BattleHero = heroData[target];
-					
-					if(hero != null && (canMoveData == null || canMoveData.indexOf(hero.pos) == -1)){
-						
-						moveResultDic[str] = 2;
-						
-					}else{
-					
-						moveResultDic[str] = 1;
-					}
+					moveResultDic[str] = false;
 					
 				}else if(heroData[target] == null){
 					
-					moveResultDic[str] = 0;
+					moveResultDic[str] = true;
 					
 				}else{
 					
 					if(moveDic[target] == null){
 						
-						moveResultDic[str] = 2;
+						moveResultDic[str] = false;
 					}
 				}
 			}
 			
 			for(str in moveDic){
 				
-				if(moveResultDic[str] == null){
+				if(!(str in moveResultDic)){
 					
 					var pos:int = int(str);
 					
@@ -925,7 +862,7 @@ package game.battle
 					
 					vec.push(pos);
 					
-					var result:int;
+					var result:Boolean;
 					
 					while(true){
 						
@@ -939,7 +876,7 @@ package game.battle
 							
 						}else if(vec.indexOf(target) != -1){
 							
-							result = 0
+							result = true;
 							
 							break;
 							
@@ -961,9 +898,9 @@ package game.battle
 		
 		private function btClick(e:Event):void{
 			
-			for each(var result:int in moveResultDic){
+			for each(var result:Boolean in moveResultDic){
 				
-				if(result == 2){
+				if(!result){
 					
 					return;
 				}
@@ -973,8 +910,6 @@ package game.battle
 				
 				clearNowChooseCard();
 			}
-			
-			isActioned = true;
 			
 			var moveData:Vector.<Vector.<int>>;
 			
@@ -1019,7 +954,7 @@ package game.battle
 			}
 		}
 		
-		public function playBattle(_summonData1:Vector.<Vector.<int>>,_summonData2:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		public function playBattle(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
 			isPlayBattle = true;
 			
@@ -1053,73 +988,38 @@ package game.battle
 			
 			arrowContainer.flatten();
 			
-			startSummon(_summonData1,_summonData2,_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+			startSummon(_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID);
 		}
 		
-		private function startSummon(_summonData1:Vector.<Vector.<int>>,_summonData2:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startSummon(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
-			if(_summonData1 != null && _summonData1.length > 0){
+			if(_summonData != null && _summonData.length > 0){
 				
-				var pos:int = _summonData1[0][2];
+				var pos:int = _summonData[0][2];
 				
 				var tmpBattleMapUnit:BattleMapUnit = battleMap.dic[pos];
 				
-				moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startSummonReal,_summonData1,_summonData2,_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
-				
-			}else if(_summonData2 != null && _summonData2.length > 0){
-				
-				pos = _summonData2[0][2];
-				
-				tmpBattleMapUnit = battleMap.dic[pos];
-				
-				moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startSummonReal,_summonData1,_summonData2,_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+				moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startSummonReal,_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID);
 				
 			}else{
 				
-				startMove(_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+				startMove(_moveData,_skillData,_attackData,_cardUid,_cardID);
 			}
 		}
 		
-		private function startSummonReal(_summonData1:Vector.<Vector.<int>>,_summonData2:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startSummonReal(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
-			if(isHost){
+			if(_summonData != null && _summonData.length > 0){
 				
-				if(_summonData1 != null && _summonData1.length > 0){
-					
-					var vec:Vector.<int> = _summonData1.shift();
-					
-					var hero:BattleHero = new BattleHero;
-					
+				var vec:Vector.<int> = _summonData.shift();
+				
+				var hero:BattleHero = new BattleHero;
+				
+				if(!isActioned){
+				
 					hero.isMine = true;
 					
 				}else{
-					
-					vec = _summonData2.shift();
-					
-					hero = new BattleHero;
-					
-					hero.isMine = false;
-					
-					oppCardsNum--;
-					
-					refreshUIContainer();
-				}
-				
-			}else{
-				
-				if(_summonData2 != null && _summonData2.length > 0){
-					
-					vec = _summonData2.shift();
-					
-					hero = new BattleHero;
-					
-					hero.isMine = true;
-					
-				}else{
-					
-					vec = _summonData1.shift();
-					
-					hero = new BattleHero;
 					
 					hero.isMine = false;
 					
@@ -1128,7 +1028,7 @@ package game.battle
 					refreshUIContainer();
 				}
 			}
-			
+				
 			hero.pos = vec[2];
 			
 			hero.csv = Csv.getData(Csv_hero.NAME,vec[1]) as Csv_hero;
@@ -1152,14 +1052,14 @@ package game.battle
 			
 //			TweenLite.to(hero,0.5,{scaleX:1,scaleY:1,ease:Quad.easeIn,onComplete:startSummon,onCompleteParams:[_summonData1,_summonData2,_moveData,_skillData,_attackData,_cardUid,_cardID,_canMoveData]});
 			
-			TweenLite.to(hero,0.5,{scaleX:1,scaleY:1,ease:com.greensock.easing.Quad.easeIn,onComplete:delayCall,onCompleteParams:[0.5,startSummon,[_summonData1,_summonData2,_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]]});
+			TweenLite.to(hero,0.5,{scaleX:1,scaleY:1,ease:com.greensock.easing.Quad.easeIn,onComplete:delayCall,onCompleteParams:[0.5,startSummon,[_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID]]});
 		}
 		
-		private function startMove(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startMove(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 				
 			if(_moveData == null || _moveData.length == 0){
 				
-				startSkill(_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+				startSkill(_skillData,_attackData,_cardUid,_cardID);
 				
 			}else{
 				
@@ -1218,8 +1118,6 @@ package game.battle
 					
 					var hero:BattleHero = heroData[pos];
 					
-					canMoveData.splice(canMoveData.indexOf(pos),1);
-					
 					delete heroData[pos];
 					
 					hero.pos = target;
@@ -1235,11 +1133,11 @@ package game.battle
 				_x = _x / heroVec.length;
 				_y = _y / heroVec.length;
 				
-				moveGameContainerToCenter(_x,_y,startMoveReal,_moveData,_skillData,_attackData,_cardUid,_cardID,heroVec,_oppCardID,_canMoveData);
+				moveGameContainerToCenter(_x,_y,startMoveReal,_moveData,_skillData,_attackData,_cardUid,_cardID,heroVec);
 			}
 		}
 		
-		private function startMoveReal(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_heroVec:Vector.<BattleHero>,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startMoveReal(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_heroVec:Vector.<BattleHero>):void{
 			
 			var hasAddCallBack:Boolean = false;
 			
@@ -1251,7 +1149,7 @@ package game.battle
 					
 					hasAddCallBack = true;
 					
-					TweenLite.to(hero,0.5,{ease:Linear.easeNone,x:tmpBattleMapUnit.x,y:tmpBattleMapUnit.y,onComplete:moveComplete,onCompleteParams:[_moveData,_skillData,_attackData,_cardUid,_cardID,_heroVec,_oppCardID,_canMoveData]});
+					TweenLite.to(hero,0.5,{ease:Linear.easeNone,x:tmpBattleMapUnit.x,y:tmpBattleMapUnit.y,onComplete:moveComplete,onCompleteParams:[_moveData,_skillData,_attackData,_cardUid,_cardID,_heroVec]});
 					
 				}else{
 					
@@ -1260,7 +1158,7 @@ package game.battle
 			}
 		}
 		
-		private function moveComplete(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_heroVec:Vector.<BattleHero>,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function moveComplete(_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_heroVec:Vector.<BattleHero>):void{
 			
 			for each(var hero:BattleHero in _heroVec){
 				
@@ -1290,18 +1188,18 @@ package game.battle
 			
 			battleMap.refresh(mapData);
 			
-			TweenLite.delayedCall(0.5,startMove,[_moveData,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]);
+			TweenLite.delayedCall(0.5,startMove,[_moveData,_skillData,_attackData,_cardUid,_cardID]);
 			
 //			startMove(_moveData,_skillData,_attackData,_cardUid,_cardID,_canMoveData);
 		}
 		
-		private function startSkill(_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startSkill(_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
 			effectContainer.removeChildren();
 			
 			if(_skillData == null || _skillData.length == 0){
 				
-				castSkillOver(_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+				castSkillOver(_attackData,_cardUid,_cardID);
 				
 				return;
 			}
@@ -1312,10 +1210,10 @@ package game.battle
 			
 			var tmpBattleMapUnit:BattleMapUnit = battleMap.dic[pos];
 			
-			moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startSkillReal,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+			moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startSkillReal,_skillData,_attackData,_cardUid,_cardID);
 		}	
 			
-		private function startSkillReal(_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startSkillReal(_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 		
 			var vec:Vector.<Vector.<int>> = _skillData.shift();
 			
@@ -1360,7 +1258,7 @@ package game.battle
 				
 				if(index == 0){
 					
-					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:skillShootTarget,onCompleteParams:[sp,index,pos,targetPos,vec2,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]});
+					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:skillShootTarget,onCompleteParams:[sp,index,pos,targetPos,vec2,_skillData,_attackData,_cardUid,_cardID]});
 					
 				}else{
 					
@@ -1377,7 +1275,7 @@ package game.battle
 		private static const tfWidth:int = 200;
 		private static const tfHeight:int = 30;
 		
-		private function skillShootTarget(_arrow:Sprite,_index:int,_pos:int,_targetPos:int,_vec:Vector.<int>,_skillData:Vector.<Vector.<Vector.<int>>> = null,_attackData:Vector.<Vector.<Vector.<int>>> = null,_cardUid:int = 0,_cardID:int = 0,_oppCardID:int = 0,_canMoveData:Vector.<int> = null):void{
+		private function skillShootTarget(_arrow:Sprite,_index:int,_pos:int,_targetPos:int,_vec:Vector.<int>,_skillData:Vector.<Vector.<Vector.<int>>> = null,_attackData:Vector.<Vector.<Vector.<int>>> = null,_cardUid:int = 0,_cardID:int = 0):void{
 			
 			TweenLite.to(_arrow,0.5,{alpha:0,onComplete:arrowAlphaOutOver,onCompleteParams:[_arrow]});
 			
@@ -1658,7 +1556,7 @@ package game.battle
 			
 			if(_skillData != null){
 				
-				TweenLite.to(sp,2,{y:sp.y - 30,ease:Linear.easeNone,onComplete:skillTfTweenOver1,onCompleteParams:[sp,_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]});
+				TweenLite.to(sp,2,{y:sp.y - 30,ease:Linear.easeNone,onComplete:skillTfTweenOver1,onCompleteParams:[sp,_skillData,_attackData,_cardUid,_cardID]});
 				
 			}else{
 			
@@ -1671,11 +1569,11 @@ package game.battle
 			effectContainer.removeChild(_arrow);
 		}
 		
-		private function skillTfTweenOver1(_sp:Sprite,_skillData:Vector.<Vector.<Vector.<int>>> = null,_attackData:Vector.<Vector.<Vector.<int>>> = null,_cardUid:int = 0,_cardID:int = 0,_oppCardID:int = 0,_canMoveData:Vector.<int> = null):void{
+		private function skillTfTweenOver1(_sp:Sprite,_skillData:Vector.<Vector.<Vector.<int>>> = null,_attackData:Vector.<Vector.<Vector.<int>>> = null,_cardUid:int = 0,_cardID:int = 0):void{
 			
 			if(_skillData != null){
 			
-				TweenLite.to(_sp,0.5,{alpha:0,ease:Linear.easeNone,onComplete:startSkill,onCompleteParams:[_skillData,_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]});
+				TweenLite.to(_sp,0.5,{alpha:0,ease:Linear.easeNone,onComplete:startSkill,onCompleteParams:[_skillData,_attackData,_cardUid,_cardID]});
 			
 			}else{
 				
@@ -1683,7 +1581,7 @@ package game.battle
 			}
 		}
 		
-		private function castSkillOver(_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function castSkillOver(_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
 			var hasAddCallBack:Boolean = false;
 			
@@ -1701,7 +1599,7 @@ package game.battle
 							
 							hasAddCallBack = true;
 							
-							TweenLite.delayedCall(1,startAttack,[_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]);
+							TweenLite.delayedCall(1,startAttack,[_attackData,_cardUid,_cardID]);
 						}
 						
 						TweenLite.to(hero,0.5,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[hero]});
@@ -1739,7 +1637,7 @@ package game.battle
 			
 			if(!hasAddCallBack){
 				
-				TweenLite.delayedCall(0.5,startAttack,[_attackData,_cardUid,_cardID,_oppCardID,_canMoveData]);
+				TweenLite.delayedCall(0.5,startAttack,[_attackData,_cardUid,_cardID]);
 			}
 			
 		}
@@ -1749,7 +1647,7 @@ package game.battle
 			_sp.parent.removeChild(_sp);
 		}
 		
-		private function startAttack(_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startAttack(_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
 			var attackDic:Dictionary = new Dictionary;
 			
@@ -1818,10 +1716,10 @@ package game.battle
 				}
 			}
 			
-			startAttack1(attackDic,beAttackDic,beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData);
+			startAttack1(attackDic,beAttackDic,beHitDic,_cardUid,_cardID);
 		}
 		
-		private function startAttack1(_attackDic:Dictionary,_beAttackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startAttack1(_attackDic:Dictionary,_beAttackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int):void{
 			
 			effectContainer.removeChildren();
 			
@@ -1839,18 +1737,18 @@ package game.battle
 				
 				var targetBattleMapUnit:BattleMapUnit = battleMap.dic[pos];
 				
-				moveGameContainerToCenter(targetBattleMapUnit.x,targetBattleMapUnit.y,startAttack1Real,_attackDic,_beAttackDic,_beHitDic,_cardUid,_cardID,pos,obj,_oppCardID,_canMoveData);
+				moveGameContainerToCenter(targetBattleMapUnit.x,targetBattleMapUnit.y,startAttack1Real,_attackDic,_beAttackDic,_beHitDic,_cardUid,_cardID,pos,obj);
 				
 				break;
 			}
 			
 			if(!hasBeAttack){
 			
-				startAttack2(_attackDic,_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData);
+				startAttack2(_attackDic,_beHitDic,_cardUid,_cardID);
 			}
 		}
 		
-		private function startAttack1Real(_attackDic:Dictionary,_beAttackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_pos:int,_obj:Object,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startAttack1Real(_attackDic:Dictionary,_beAttackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_pos:int,_obj:Object):void{
 			
 			var targetBattleMapUnit:BattleMapUnit = battleMap.dic[_pos];
 			
@@ -1921,7 +1819,7 @@ package game.battle
 				
 				if(i == vec.length - 1){
 					
-					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:shoowTarget,onCompleteParams:[sp,_pos,damage,hitNum,startAttack1,_attackDic,_beAttackDic,_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData]});
+					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:shoowTarget,onCompleteParams:[sp,_pos,damage,hitNum,startAttack1,_attackDic,_beAttackDic,_beHitDic,_cardUid,_cardID]});
 					
 				}else{
 					
@@ -1992,7 +1890,7 @@ package game.battle
 			TweenLite.to(_sp,0.5,{alpha:0,onComplete:_callBack,onCompleteParams:_arg});
 		}
 		
-		private function startAttack2(_attackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startAttack2(_attackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int):void{
 			
 			effectContainer.removeChildren();
 			
@@ -2010,18 +1908,18 @@ package game.battle
 				
 				var tmpBattleMapUnit:BattleMapUnit = battleMap.dic[pos];
 				
-				moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startAttack2Real,_attackDic,_beHitDic,_cardUid,_cardID,pos,obj,_oppCardID,_canMoveData);
+				moveGameContainerToCenter(tmpBattleMapUnit.x,tmpBattleMapUnit.y,startAttack2Real,_attackDic,_beHitDic,_cardUid,_cardID,pos,obj);
 				
 				break;
 			}
 			
 			if(!hasAttack){
 				
-				attackOver(_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData);
+				attackOver(_beHitDic,_cardUid,_cardID);
 			}
 		}
 		
-		private function startAttack2Real(_attackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_pos:int,_obj:Object,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function startAttack2Real(_attackDic:Dictionary,_beHitDic:Dictionary,_cardUid:int,_cardID:int,_pos:int,_obj:Object):void{
 			
 			var tmpBattleMapUnit:BattleMapUnit = battleMap.dic[_pos];
 			
@@ -2057,7 +1955,7 @@ package game.battle
 					
 					hasAddCallBack = true;
 					
-					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:shoowTarget,onCompleteParams:[sp,targetPos,damage,0,startAttack2,_attackDic,_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData]});
+					TweenLite.to(sp,0.8,{x:targetBattleMapUnit.x - Math.cos(sp.rotation) * sp.width * 0.5,y:targetBattleMapUnit.y - Math.sin(sp.rotation) * sp.width * 0.5,ease:ElasticIn.ease,onComplete:shoowTarget,onCompleteParams:[sp,targetPos,damage,0,startAttack2,_attackDic,_beHitDic,_cardUid,_cardID]});
 					
 				}else{
 					
@@ -2066,7 +1964,7 @@ package game.battle
 			}
 		}
 		
-		private function attackOver(_beHitDic:Dictionary,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
+		private function attackOver(_beHitDic:Dictionary,_cardUid:int,_cardID:int):void{
 			
 			var hasAddCallBack:Boolean = false;
 			
@@ -2086,7 +1984,7 @@ package game.battle
 							
 							hasAddCallBack = true;
 							
-							TweenLite.delayedCall(1,resetData,[_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData]);
+							TweenLite.delayedCall(1,resetData,[_beHitDic,_cardUid,_cardID]);
 						}
 						
 						TweenLite.to(hero,0.5,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[hero]});
@@ -2144,75 +2042,73 @@ package game.battle
 			
 			if(!hasAddCallBack){
 				
-				TweenLite.delayedCall(0.5,resetData,[_beHitDic,_cardUid,_cardID,_oppCardID,_canMoveData]);
+				TweenLite.delayedCall(0.5,resetData,[_beHitDic,_cardUid,_cardID]);
 			}
 		}
 		
-		private function resetData(_beHitDic:Dictionary,_cardUid:int,_cardID:int,_oppCardID:int,_canMoveData:Vector.<int>):void{
-			
-			canMoveData = _canMoveData;
-			
-			for each(var hero:BattleHero in heroData){
-				
-				hero.refresh(true);
-			}
+		private function resetData(_beHitDic:Dictionary,_cardUid:int,_cardID:int):void{
 			
 			var isTween:Boolean = false;
 			
-			if(_cardID != -1){
-				
-				myAllCardsNum--;
-				
-				var card:BattleCard = new BattleCard(_cardID);
-				
-				if(_cardUid != -1){
-				
-					card.uid = _cardUid;
+			if(isActioned){
+			
+				if(_cardID != -1){
 					
-					myCards.push(card);
+					myAllCardsNum--;
 					
-					cardContainer.addChild(card);
+					var card:BattleCard = new BattleCard(_cardID);
 					
-					refreshCards();
+					if(_cardUid != -1){
+					
+						card.uid = _cardUid;
+						
+						myCards.push(card);
+						
+						cardContainer.addChild(card);
+						
+						refreshCards();
+						
+					}else{
+						
+						isTween = true;
+						
+						card.x = Starling.current.backBufferWidth * 0.5;
+						
+						card.y = Starling.current.backBufferHeight - card.height * 2;
+							
+						heroDetailContainer.addChild(card);
+						
+						TweenLite.to(card,2,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[card]});
+					}
+				}
+				
+			}else{
+			
+				if(_cardID == -1){
+				
+					if(oppAllCardsNum > 0){
+						
+						oppAllCardsNum--;
+						
+						oppCardsNum++;
+					}
 					
 				}else{
 					
+					oppAllCardsNum--;
+					
 					isTween = true;
+					
+					card = new BattleCard(_cardID);
 					
 					card.x = Starling.current.backBufferWidth * 0.5;
 					
-					card.y = Starling.current.backBufferHeight - card.height * 2;
-						
+					card.y = card.height * 2;
+					
 					heroDetailContainer.addChild(card);
 					
 					TweenLite.to(card,2,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[card]});
 				}
-			}
-			
-			if(_oppCardID == -1){
-			
-				if(oppAllCardsNum > 0){
-					
-					oppAllCardsNum--;
-					
-					oppCardsNum++;
-				}
-				
-			}else{
-				
-				oppAllCardsNum--;
-				
-				isTween = true;
-				
-				card = new BattleCard(_oppCardID);
-				
-				card.x = Starling.current.backBufferWidth * 0.5;
-				
-				card.y = card.height * 2;
-				
-				heroDetailContainer.addChild(card);
-				
-				TweenLite.to(card,2,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[card]});
 			}
 			
 			if(!isTween){
@@ -2237,15 +2133,20 @@ package game.battle
 			
 			refreshMoneyTf();
 		
-			isActioned = false;
+			isActioned = !isActioned;
 			
 			Starling.current.touchable = true;
 			
-			actionBt.enabled = true;
+			actionBt.enabled = !isActioned;
 			
 			isPlayBattle = false;
 			
 			Starling.current.nativeStage.addEventListener(MouseEvent.MOUSE_WHEEL,onMouseWheel);
+			
+			for each(var hero:BattleHero in heroData){
+				
+				hero.refresh(true);
+			}
 			
 			if(playBattleOverCallBack != null){
 				

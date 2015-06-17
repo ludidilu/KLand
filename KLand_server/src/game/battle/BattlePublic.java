@@ -1021,24 +1021,24 @@ public class BattlePublic {
 			
 			break;
 			
-		case 8:
-			
-			if(_effectTarget){
-				
-				_targetHero.isStopMove = true;
-				
-				_resultArr.add(5);
-				_resultArr.add(0);
-				
-			}else{
-				
-				_hero.isStopMove = true;
-				
-				_resultArr.add(105);
-				_resultArr.add(0);
-			}
-			
-			break;
+//		case 8:
+//			
+//			if(_effectTarget){
+//				
+//				_targetHero.isStopMove = true;
+//				
+//				_resultArr.add(5);
+//				_resultArr.add(0);
+//				
+//			}else{
+//				
+//				_hero.isStopMove = true;
+//				
+//				_resultArr.add(105);
+//				_resultArr.add(0);
+//			}
+//			
+//			break;
 		}
 		
 //		switch(_effect){

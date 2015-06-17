@@ -110,17 +110,22 @@ package game.battle
 								
 								if(isMine){
 									
-									if(Battle.instance.moveDic[pos] != null){
+									if(!Battle.instance.isActioned){
 										
-										var result:int = Battle.instance.moveResultDic[pos];
-										
-										if(result == 0){
+										if(Battle.instance.moveDic[pos] != null){
 											
-											colorType = 2;
+											if(Battle.instance.moveResultDic[pos]){
+												
+												colorType = 2;
+												
+												break loop;
+												
+											}else{
+												
+												colorType = 1;
+											}
 											
-											break loop;
-											
-										}else if(result == 1){
+										}else{
 											
 											colorType = 1;
 										}
@@ -128,7 +133,7 @@ package game.battle
 									
 								}else{
 									
-									if(Battle.instance.canMoveData != null && Battle.instance.canMoveData.indexOf(pos) != -1){
+									if(Battle.instance.isActioned){
 										
 										colorType = 1;
 									}
@@ -140,19 +145,26 @@ package game.battle
 								
 								if(isMine){
 									
-									if(Battle.instance.moveDic[pos] != null){
+									if(!Battle.instance.isActioned){
 										
-										result = Battle.instance.moveResultDic[pos];
-										
-										if(result == 2){
+										if(Battle.instance.moveDic[pos] != null){
+											
+											if(Battle.instance.moveResultDic[pos]){
+												
+												colorType = 1;
+												
+											}else{
+												
+												colorType = 2;
+												
+												break loop;
+											}
+											
+										}else{
 											
 											colorType = 2;
 											
 											break loop;
-											
-										}else if(result == 1){
-											
-											colorType = 1;
 										}
 										
 									}else{
@@ -164,13 +176,13 @@ package game.battle
 									
 								}else{
 									
-									if(Battle.instance.canMoveData == null){
+									if(!Battle.instance.isActioned){
 										
 										colorType = 2;
 										
 										break loop;
 										
-									}else if(Battle.instance.canMoveData.indexOf(pos) != -1){
+									}else{
 										
 										colorType = 1;
 									}
@@ -247,6 +259,8 @@ package game.battle
 				typeColor = 0xFFFFFFFF;
 			}
 			
+//			var typeColor:uint = 0xFFFFFFFF;
+			
 			if(power == 0){
 				
 				var powerColor:uint = 0xFFFF0000;
@@ -254,10 +268,6 @@ package game.battle
 			}else if(power < Battle.POWER_CAN_MOVE || csv.heroType.moveType == 0){
 				
 				powerColor = 0xFFFFFF00;
-				
-			}else if(_refreshSkillAndMove && Battle.instance.canMoveData != null && Battle.instance.canMoveData.indexOf(pos) != -1){
-			
-				powerColor = 0xFF00FF00;
 				
 			}else{
 				

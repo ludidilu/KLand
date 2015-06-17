@@ -19,9 +19,9 @@ public class UserService extends Server_thread_service{
 		Server_thread_service.methodMap.put("quitQueueWhenDisconnectOK",UserService.class.getDeclaredMethod("quitQueueWhenDisconnectOK",boolean.class));
 		Server_thread_service.methodMap.put("enterBattle",UserService.class.getDeclaredMethod("enterBattle",Battle.class));
 		
-		Server_thread_service.methodMap.put("getBattleDataOK", UserService.class.getDeclaredMethod("getBattleDataOK", boolean.class,int.class,int.class,int.class,int[].class,int[][].class,int.class,int.class,int.class,int[][].class,int[].class,boolean.class,int[][].class,int[][].class));
+		Server_thread_service.methodMap.put("getBattleDataOK", UserService.class.getDeclaredMethod("getBattleDataOK", boolean.class,int.class,int.class,int.class,int[].class,int[][].class,int.class,int.class,int.class,int[][].class,boolean.class));
 		Server_thread_service.methodMap.put("sendBattleActionOK", UserService.class.getDeclaredMethod("sendBattleActionOK", boolean.class));
-		Server_thread_service.methodMap.put("playBattle", UserService.class.getDeclaredMethod("playBattle", int[][].class,int[][].class,int[][].class,int[][][].class,int[][][].class,int.class,int.class,int.class,int[].class));
+		Server_thread_service.methodMap.put("playBattle", UserService.class.getDeclaredMethod("playBattle", int[][].class,int[][].class,int[][][].class,int[][][].class,int.class,int.class));
 		Server_thread_service.methodMap.put("fightAiOK", UserService.class.getDeclaredMethod("fightAiOK", boolean.class));
 		Server_thread_service.methodMap.put("quitGameAiOK",UserService.class.getDeclaredMethod("quitGameAiOK",boolean.class));
 		Server_thread_service.methodMap.put("quitGameAiWhenDisconnectOK",UserService.class.getDeclaredMethod("quitGameAiWhenDisconnectOK",boolean.class));
@@ -167,9 +167,9 @@ public class UserService extends Server_thread_service{
 		}
 	}
 	
-	public void getBattleDataOK(boolean _isHost,int _nowRound,int _maxRound,int _mapID,int[] _mapData,int[][] _myCards,int _oppCardsNum,int _userAllCardsNum1,int _userAllCardsNum2,int[][] _heroData,int[] _canMoveData,boolean _isActioned,int[][] _actionHeroData,int[][] _actionSummonData) throws Exception{
+	public void getBattleDataOK(boolean _isHost,int _nowRound,int _maxRound,int _mapID,int[] _mapData,int[][] _myCards,int _oppCardsNum,int _userAllCardsNum1,int _userAllCardsNum2,int[][] _heroData,boolean _actionState) throws Exception{
 		
-		sendData(10, _isHost,_nowRound,_maxRound,_mapID, _mapData, _myCards, _oppCardsNum, _userAllCardsNum1, _userAllCardsNum2, _heroData,_canMoveData,_isActioned,_actionHeroData,_actionSummonData);
+		sendData(10, _isHost,_nowRound,_maxRound,_mapID, _mapData, _myCards, _oppCardsNum, _userAllCardsNum1, _userAllCardsNum2, _heroData,_actionState);
 	}
 	
 	public void sendBattleAction(int[][] _moveData, int[][] _summonData){
@@ -185,9 +185,9 @@ public class UserService extends Server_thread_service{
 		sendData(12, _result);
 	}
 	
-	public void playBattle(int[][] _summonData1,int[][] _summonData2,int[][] _moveData,int[][][] _skillData, int[][][] _attackData,int _cardUid,int _cardID,int _oppCardID,int[] _canMoveData) throws Exception{
+	public void playBattle(int[][] _summonData,int[][] _moveData,int[][][] _skillData, int[][][] _attackData,int _cardUid,int _cardID) throws Exception{
 		
-		sendData(13, _summonData1, _summonData2, _moveData, _skillData, _attackData,_cardUid,_cardID,_oppCardID,_canMoveData);
+		sendData(13, _summonData, _moveData, _skillData, _attackData, _cardUid, _cardID);
 	}
 	
 	public void fightAi() throws Exception{
