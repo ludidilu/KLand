@@ -230,7 +230,7 @@ package game.battle
 				
 				setSelectedUnit(_unit);
 				
-				if(!Battle.instance.isActioned && hero.isMine && hero.power >= Battle.POWER_CAN_MOVE){
+				if(!Battle.instance.isActioned && hero.isMine && hero.power >= Battle.POWER_CAN_MOVE && hero.csv.heroType.moveType != 0){
 					
 					moveFun = readyToHeroMove;
 					

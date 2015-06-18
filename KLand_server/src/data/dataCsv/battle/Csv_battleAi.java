@@ -11,6 +11,7 @@ public class Csv_battleAi extends Csv{
 	public int mapID;
 	public int roundNum;
 	public int cardsNum;
+	public int aiCardsNum;
 	public int[][] defaultHeros;
 	public int[] ai;
 }

@@ -25,7 +25,7 @@ package
 	import starling.textures.Texture;
 	
 	[SWF(width="960",height="640",frameRate="60")]
-	public class JLand_MapEditor extends flash.display.Sprite
+	public class KLand_MapEditor extends flash.display.Sprite
 	{
 		private var container:starling.display.Sprite;
 		
@@ -42,7 +42,7 @@ package
 		
 		private var browserFile:File;
 		
-		public function JLand_MapEditor()
+		public function KLand_MapEditor()
 		{
 			super();
 			

@@ -5,25 +5,26 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import userService.UserService;
 import data.dataCsv.hero.Csv_hero;
 import data.dataMap.MapUnit;
 
 public class BattleAI {
 	
-	private static UserService service;
-	
-	public static void start(UserService _service, MapUnit _mapUnit, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Integer> _userCards, ArrayList<Integer> _canMoveHeroUidArr, int _userMoney, HashMap<Integer, Integer> _summonData, HashMap<Integer, Integer> _moveData){
-		
-		service = _service;
+	public static void start(MapUnit _mapUnit, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Integer> _userCards, int _userMoney, HashMap<Integer, Integer> _summonData, HashMap<Integer, Integer> _moveData){
 		
 		HashMap<Integer, Csv_hero> canMoveHeroMap = new HashMap<>();
 		
-		for(int pos : _canMoveHeroUidArr){
+		Iterator<Entry<Integer, BattleHero>> iter = _heroMap.entrySet().iterator();
+		
+		while(iter.hasNext()){
 			
-			BattleHero hero = _heroMap.get(pos);
+			Entry<Integer, BattleHero> entry = iter.next();
+		
+			BattleHero hero = entry.getValue();
 			
-			if(!hero.isHost){
+			if(!hero.isHost && hero.power > Battle.POWER_CAN_MOVE && hero.csv.heroType.moveType != 0){
+				
+				int pos = entry.getKey();
 				
 				canMoveHeroMap.put(pos, hero.csv);
 			}
@@ -31,11 +32,11 @@ public class BattleAI {
 		
 		HashMap<Integer, Csv_hero> summonData = new HashMap<>();
 		
-		Iterator<Entry<Integer, Integer>> iter = _userCards.entrySet().iterator();
+		Iterator<Entry<Integer, Integer>> iter2 = _userCards.entrySet().iterator();
 			
-		while(iter.hasNext() && _userMoney > 0){
+		while(iter2.hasNext() && _userMoney > 0){
 			
-			Entry<Integer, Integer> entry = iter.next();
+			Entry<Integer, Integer> entry = iter2.next();
 			
 			int uid = entry.getKey();
 			
@@ -65,8 +66,6 @@ public class BattleAI {
 		
 		
 		
-		
-		
 		if(_userMoney == 0 || canMoveHeroMap.size() == 0){
 			
 			return;
@@ -80,11 +79,11 @@ public class BattleAI {
 			
 			HashMap<Integer, Integer> tmpMap2 = new HashMap<>();
 			
-			Iterator<Entry<Integer, Csv_hero>> iter2 = canMoveHeroMap.entrySet().iterator();
+			Iterator<Entry<Integer, Csv_hero>> iter3 = canMoveHeroMap.entrySet().iterator();
 			
-			while(iter2.hasNext()){
+			while(iter3.hasNext()){
 				
-				Entry<Integer, Csv_hero> entry = iter2.next();
+				Entry<Integer, Csv_hero> entry = iter3.next();
 				
 				int pos = entry.getKey();
 				
@@ -110,11 +109,11 @@ public class BattleAI {
 				
 				int randomStar = (int)(Math.random() * allMoveUnitStar);
 				
-				iter2 = canMoveHeroMap.entrySet().iterator();
+				iter3 = canMoveHeroMap.entrySet().iterator();
 				
-				while(iter2.hasNext()){
+				while(iter3.hasNext()){
 					
-					Entry<Integer, Csv_hero> entry = iter2.next();
+					Entry<Integer, Csv_hero> entry = iter3.next();
 					
 					int pos = entry.getKey();
 					
@@ -126,7 +125,7 @@ public class BattleAI {
 						
 						tmpMap.put(pos, hero);
 						
-						iter2.remove();
+						iter3.remove();
 						
 						tmpMoney = tmpMoney - 1;
 						
@@ -144,18 +143,22 @@ public class BattleAI {
 			canMoveHeroMap = tmpMap;
 		}
 		
-		Iterator<Entry<Integer, Csv_hero>> iter2 = canMoveHeroMap.entrySet().iterator();
+		Iterator<Entry<Integer, Csv_hero>> iter3 = canMoveHeroMap.entrySet().iterator();
 		
-		while(iter2.hasNext()){
+		ArrayList<Integer> moveTargetPosArr = new ArrayList<>();
+		
+		while(iter3.hasNext()){
 			
-			Entry<Integer, Csv_hero> entry = iter2.next();
+			Entry<Integer, Csv_hero> entry = iter3.next();
 			
 			int pos = entry.getKey();
 			Csv_hero hero = entry.getValue();
 			
-			int targetPos = getMovePos(_mapUnit.neighbourPosMap,_map,_heroMap,summonData,canMoveHeroMap,hero,pos);
+			int targetPos = getMovePos(_mapUnit.neighbourPosMap,_map,_heroMap,summonData,canMoveHeroMap,hero,pos,moveTargetPosArr);
 			
 			if(targetPos != -1){
+				
+				moveTargetPosArr.add(targetPos);
 				
 				_moveData.put(pos, BattlePublic.getDirection(_mapUnit.mapWidth, pos, targetPos));
 			}
@@ -257,9 +260,9 @@ public class BattleAI {
 		}
 	}
 	
-	private static int getMovePos(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Csv_hero> _summonData, HashMap<Integer, Csv_hero> _moveMap, Csv_hero _hero, int _pos){
+	private static int getMovePos(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Csv_hero> _summonData, HashMap<Integer, Csv_hero> _moveMap, Csv_hero _hero, int _pos, ArrayList<Integer> _moveTargetPosArr){
 		
-		String str = "";
+		String str = "\nNow pos:" + _pos + "\n";
 		
 		ArrayList<Integer> posArr = new ArrayList<>();
 		
@@ -273,32 +276,39 @@ public class BattleAI {
 			
 			if(pos != -1){
 				
-				if(!_summonData.containsKey(pos)){
+				if(!_summonData.containsKey(pos) && !_moveTargetPosArr.contains(pos)){
 					
 					BattleHero hero = _heroMap.get(pos);
 					
-					if(hero != null && !hero.isHost && !_moveMap.containsKey(pos)){
+					if(hero != null){
 						
-						continue;
-						
-					}else{
-						
-						posArr.add(pos);
-						
-						int score = getMovePosScore(_neighbourPosMap, _map, _heroMap, _hero, pos);
-						
-						scoreArr.add(score);
-						
-						allScore = allScore + score;
-						
-						str = str + "pos:" + pos + " score:" + score + "\n";
+						if(hero.isHost){
+							
+							continue;
+							
+						}else{
+							
+							if(!_moveMap.containsKey(pos)){
+								
+								continue;
+							}
+						}
 					}
+					
+					posArr.add(pos);
+					
+					int score = getMovePosScore(_neighbourPosMap, _map, _heroMap, _hero, pos);
+					
+					scoreArr.add(score);
+					
+					allScore = allScore + score;
+					
+					str = str + "pos:" + pos + " score:" + score + "\n";
 				}
 			}
 		}
 		
-		service.process("sendMsg", str);
-		
+		System.out.println(str);
 		
 		if(allScore > 0){
 			

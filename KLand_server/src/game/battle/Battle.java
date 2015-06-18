@@ -41,7 +41,7 @@ public class Battle extends SuperService{
 	private static int START_CARDS_NUM = 4;
 	private static int MAX_CARDS_NUM = 5;
 	private static int MONEY = 5;
-	public static int POWER_CAN_MOVE = 1;
+	public static int POWER_CAN_MOVE = 2;
 	
 	private UserService service1;
 	private UserService service2;
@@ -133,7 +133,7 @@ public class Battle extends SuperService{
 				userAllCards2.add(heroID);
 			}
 			
-			userAllCards2 = PublicTools.getSomeOfArr(userAllCards2,csv_battleAi.cardsNum);
+			userAllCards2 = PublicTools.getSomeOfArr(userAllCards2,csv_battleAi.aiCardsNum);
 			
 			aiMoney = csv_ai.money;
 			
@@ -325,17 +325,12 @@ public class Battle extends SuperService{
 			}
 		}
 		
-		_service.process("sendBattleActionOK", true);
-		
-//		if(service2 == null){
-//
-//			BattleAI.start(service1,mapUnit,map,heroMap,userCards2,canMoveHeroArr,aiMoney,summonData2,moveData2);
-//			
-//			isActioned2 = true;
-//		}
-		
+		showBattle(summonData,moveData);
+	}
 
-		battleStart(summonData,moveData);
+	private void showBattle(HashMap<Integer, Integer> _summonData,HashMap<Integer, Integer> _moveData){
+
+		battleStart(_summonData,_moveData);
 		
 		actionState = !actionState;
 		
@@ -396,9 +391,20 @@ public class Battle extends SuperService{
 				}
 				
 				battleOver();
+				
+			}else{
+				
+				if(service2 == null && !actionState){
+					
+					HashMap<Integer, Integer> summonData = new HashMap<>();
+					HashMap<Integer, Integer> moveData = new HashMap<>();
+					
+					BattleAI.start(mapUnit,map,heroMap,userCards2,aiMoney,summonData,moveData);
+					
+					showBattle(summonData,moveData);
+				}
 			}
 		}
-		
 	}
 	
 	private void battleStart(HashMap<Integer, Integer> _summonData, HashMap<Integer, Integer> _moveData){
@@ -429,7 +435,16 @@ public class Battle extends SuperService{
 			mapState = 2;
 		}
 		
-		int money = MONEY;
+		int money;
+		
+		if(service != null){
+			
+			money = MONEY;
+			
+		}else{
+			
+			money = aiMoney;
+		}
 		
 		int[][] summonResult = null;
 		
@@ -566,7 +581,7 @@ public class Battle extends SuperService{
 					continue;
 				}
 				
-				if(hero.isJustSummon || hero.power < POWER_CAN_MOVE){
+				if(hero.isJustSummon || hero.power < POWER_CAN_MOVE || hero.csv.heroType.moveType == 0){
 					
 					service.process("sendMsg", "BattleError 8");
 					
@@ -751,7 +766,7 @@ public class Battle extends SuperService{
 
 			BattleHero hero = iter.next();
 
-			if(hero.isJustSummon || hero.power == 0 || hero.csv.silentSkillIndexArr == null){
+			if((hero.isJustSummon && hero.csv.heroType.moveType != 2) || hero.power == 0 || hero.csv.silentSkillIndexArr == null){
 				
 				continue;
 			}
@@ -775,7 +790,7 @@ public class Battle extends SuperService{
 
 			BattleHero hero = iter.next();
 			
-			if(hero.isJustSummon || hero.power == 0 || hero.isSilent){
+			if((hero.isJustSummon && hero.csv.heroType.moveType != 2) || hero.power == 0 || hero.isSilent){
 				
 				continue;
 			}
@@ -856,7 +871,7 @@ public class Battle extends SuperService{
 
 			BattleHero hero = iter.next();
 			
-			if(!hero.csv.heroType.canAttack || hero.isJustSummon || hero.power == 0 || hero.getAtk() < 1){
+			if(!hero.csv.heroType.canAttack || (hero.isJustSummon && hero.csv.heroType.moveType != 2) || hero.power == 0 || hero.getAtk() < 1){
 				
 				continue;
 			}
@@ -1106,7 +1121,10 @@ public class Battle extends SuperService{
 		}
 		//--------
 		
-		service.process("playBattle", summonResult, moveResult, skillResult, attackResult, cardUid, cardUid == -1 ? cardID : -1);
+		if(service != null){
+		
+			service.process("sendBattleActionOK", summonResult, moveResult, skillResult, attackResult, cardUid, cardUid == -1 ? cardID : -1);
+		}
 		
 		if(oppService != null){
 		

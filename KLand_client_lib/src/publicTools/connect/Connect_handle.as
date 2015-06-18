@@ -81,9 +81,9 @@ package publicTools.connect
 			Game.getBattleData(_isHost,_nowRound,_maxRound,_mapID,_mapData,_myCards,_oppCardsNum,_userAllCardsNum1,_userAllCardsNum2,_heroData,_isActioned);
 		}
 		
-		public static function sendBattleActionOK(_result:Boolean):void{
+		public static function sendBattleActionOK(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
-			Game.sendBattleActionOK(_result);
+			Game.playBattle(_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID);
 		}
 		
 		public static function playBattle(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{

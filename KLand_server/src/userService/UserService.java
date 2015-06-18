@@ -20,7 +20,7 @@ public class UserService extends Server_thread_service{
 		Server_thread_service.methodMap.put("enterBattle",UserService.class.getDeclaredMethod("enterBattle",Battle.class));
 		
 		Server_thread_service.methodMap.put("getBattleDataOK", UserService.class.getDeclaredMethod("getBattleDataOK", boolean.class,int.class,int.class,int.class,int[].class,int[][].class,int.class,int.class,int.class,int[][].class,boolean.class));
-		Server_thread_service.methodMap.put("sendBattleActionOK", UserService.class.getDeclaredMethod("sendBattleActionOK", boolean.class));
+		Server_thread_service.methodMap.put("sendBattleActionOK", UserService.class.getDeclaredMethod("sendBattleActionOK", int[][].class,int[][].class,int[][][].class,int[][][].class,int.class,int.class));
 		Server_thread_service.methodMap.put("playBattle", UserService.class.getDeclaredMethod("playBattle", int[][].class,int[][].class,int[][][].class,int[][][].class,int.class,int.class));
 		Server_thread_service.methodMap.put("fightAiOK", UserService.class.getDeclaredMethod("fightAiOK", boolean.class));
 		Server_thread_service.methodMap.put("quitGameAiOK",UserService.class.getDeclaredMethod("quitGameAiOK",boolean.class));
@@ -180,9 +180,9 @@ public class UserService extends Server_thread_service{
 		}
 	}
 	
-	public void sendBattleActionOK(boolean _result) throws Exception{
+	public void sendBattleActionOK(int[][] _summonData,int[][] _moveData,int[][][] _skillData, int[][][] _attackData,int _cardUid,int _cardID) throws Exception{
 		
-		sendData(12, _result);
+		sendData(12, _summonData, _moveData, _skillData, _attackData, _cardUid, _cardID);
 	}
 	
 	public void playBattle(int[][] _summonData,int[][] _moveData,int[][][] _skillData, int[][][] _attackData,int _cardUid,int _cardID) throws Exception{

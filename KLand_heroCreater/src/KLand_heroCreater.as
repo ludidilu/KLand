@@ -8,11 +8,11 @@ package
 	
 	import csv.Csv;
 	
-	public class JLand_heroCreater extends Sprite
+	public class KLand_heroCreater extends Sprite
 	{
-		public static const csvPath:String = "c:/inetpub/wwwroot/JLand/data/csv/";
+		public static const csvPath:String = "c:/inetpub/wwwroot/KLand/data/csv/";
 		
-		public function JLand_heroCreater()
+		public function KLand_heroCreater()
 		{
 			Csv.init(csvPath,Vector.<String>([Csv_heroData.NAME,Csv_heroTypeData.NAME]),Vector.<Class>([Csv_heroData,Csv_heroTypeData]),getCsv);
 		}

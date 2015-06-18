@@ -100,11 +100,6 @@ package game
 			Starling.current.stage.addChild(battle);
 		}
 		
-		public static function sendBattleActionOK(_result:Boolean):void{
-			
-			battle.sendBattleActionOK(_result);
-		}
-		
 		public static function playBattle(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
 			
 			battle.playBattle(_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID);

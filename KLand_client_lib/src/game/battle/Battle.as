@@ -40,7 +40,7 @@ package game.battle
 	{
 		public static const MAX_CARDS_NUM:int = 5;
 		public static const MONEY_NUM:int = 5;
-		public static const POWER_CAN_MOVE:int = 1;
+		public static const POWER_CAN_MOVE:int = 2;
 		
 		private static const CARD_WIDTH:int = 64;
 		private static const CARD_HEIGHT:int = 80;
@@ -89,8 +89,8 @@ package game.battle
 		internal var isActioned:Boolean;
 		private var isPlayBattle:Boolean;
 		
-		private var playBattleOverCallBack:Function;
-		private var playBattleOverCallBackArg:Array;
+		private var playBattleOverCallBack:Vector.<Function> = new Vector.<Function>;
+		private var playBattleOverCallBackArg:Vector.<Array> = new Vector.<Array>;
 		
 		private var actionBt:Button;
 		private var quitBt:Button;
@@ -946,15 +946,15 @@ package game.battle
 			Connect_handle.sendData(11,moveData,summonData);
 		}
 		
-		public function sendBattleActionOK(_result:Boolean):void{
-			
-			if(_result){
-				
-				actionBt.enabled = false;
-			}
-		}
-		
 		public function playBattle(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
+			
+			if(isPlayBattle){
+				
+				playBattleOverCallBack.push(playBattle);
+				playBattleOverCallBackArg.push([_summonData,_moveData,_skillData,_attackData,_cardUid,_cardID]);
+				
+				return;
+			}
 			
 			isPlayBattle = true;
 			
@@ -2148,12 +2148,12 @@ package game.battle
 				hero.refresh(true);
 			}
 			
-			if(playBattleOverCallBack != null){
+			if(playBattleOverCallBack.length > 0){
 				
-				playBattleOverCallBack.apply(null,playBattleOverCallBackArg);
+				var fun:Function = playBattleOverCallBack.shift();
+				var arg:Array = playBattleOverCallBackArg.shift();
 				
-				playBattleOverCallBack = null;
-				playBattleOverCallBackArg = null;
+				fun.apply(null,arg);
 			}
 		}
 		
@@ -2272,8 +2272,8 @@ package game.battle
 				
 			}else{
 				
-				playBattleOverCallBack = leaveBattleReal;
-				playBattleOverCallBackArg = [_result];
+				playBattleOverCallBack.push(leaveBattleReal);
+				playBattleOverCallBackArg.push([_result]);
 			}
 		}
 		
