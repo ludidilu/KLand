@@ -1419,6 +1419,32 @@ package game.battle
 						
 						break;
 					
+					case 6:
+						
+						if(data < 100){
+							
+							str = "W-" + (100 - data) + "%";
+							
+							color = 0x00FF00;
+							
+						}else{
+							
+							str = "W+" + (data - 100) + "%";
+							
+							color = 0xFF0000;
+						}
+						
+						tf = new TextField(tfWidth,tfHeight,str,ResourceFont.fontName,tfSize,color);
+						tf.hAlign = HAlign.CENTER;
+						tf.vAlign = VAlign.CENTER;
+						
+						tmpBattleMapUnit = battleMap.dic[_targetPos];
+						
+						tf.x = tmpBattleMapUnit.x - 0.5 * tf.width;
+						tf.y = tmpBattleMapUnit.y - 0.5 * tf.height - tfFix - tfVerticalGap * i;
+						
+						break;
+					
 					case 101:
 						
 						str = "Silent";
@@ -1536,6 +1562,32 @@ package game.battle
 						
 						str = "Root";
 						color = 0xFF0000;
+						
+						tf = new TextField(tfWidth,tfHeight,str,ResourceFont.fontName,tfSize,color);
+						tf.hAlign = HAlign.CENTER;
+						tf.vAlign = VAlign.CENTER;
+						
+						tmpBattleMapUnit = battleMap.dic[_pos];
+						
+						tf.x = tmpBattleMapUnit.x - 0.5 * tf.width;
+						tf.y = tmpBattleMapUnit.y - 0.5 * tf.height - tfFix - tfVerticalGap * _index;
+						
+						break;
+					
+					case 106:
+						
+						if(data < 100){
+							
+							str = "W-" + (100 - data) + "%";
+							
+							color = 0x00FF00;
+							
+						}else{
+							
+							str = "W+" + (data - 100) + "%";
+							
+							color = 0xFF0000;
+						}
 						
 						tf = new TextField(tfWidth,tfHeight,str,ResourceFont.fontName,tfSize,color);
 						tf.hAlign = HAlign.CENTER;

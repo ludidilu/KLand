@@ -543,7 +543,7 @@ public class BattlePublic {
 				
 				hpArr[index] = hero.hp;
 				
-				int weight = hero.hp * hero.csv.beAttackTargetWeight;
+				int weight = hero.hp * hero.getHpWeight();
 				
 				allWeight = allWeight + weight;
 				
@@ -570,9 +570,9 @@ public class BattlePublic {
 								
 								result[index] = result[index] + 1;
 								
-								weightArr[index] = weightArr[index] - hero.csv.beAttackTargetWeight;
+								weightArr[index] = weightArr[index] - hero.getHpWeight();
 								
-								allWeight = allWeight - hero.csv.beAttackTargetWeight;
+								allWeight = allWeight - hero.getHpWeight();
 								
 								atk = atk - 1;
 								
@@ -703,6 +703,22 @@ public class BattlePublic {
 			case 8:
 				
 				return _hero.csv.heroType.moveType == 0;
+				
+			case 9:
+				
+				return _hero.csv.atk > _arg;
+				
+			case 10:
+				
+				return _hero.csv.atk < _arg;
+				
+			case 11:
+				
+				return _hero.csv.star > _arg;
+				
+			case 12:
+				
+				return _hero.csv.star < _arg;
 		}
 		
 		return false;
@@ -1021,138 +1037,26 @@ public class BattlePublic {
 			
 			break;
 			
-//		case 8:
-//			
-//			if(_effectTarget){
-//				
-//				_targetHero.isStopMove = true;
-//				
-//				_resultArr.add(5);
-//				_resultArr.add(0);
-//				
-//			}else{
-//				
-//				_hero.isStopMove = true;
-//				
-//				_resultArr.add(105);
-//				_resultArr.add(0);
-//			}
-//			
-//			break;
+		case 8:
+			
+			if(_effectTarget){
+				
+				_targetHero.beAtkWeightFix = _targetHero.beAtkWeightFix * _effectArg[0] * 0.01f;
+				
+				_resultArr.add(6);
+				_resultArr.add(_effectArg[0]);
+				
+			}else{
+				
+				_hero.beAtkWeightFix = _hero.beAtkWeightFix * _effectArg[0] * 0.01f;
+				
+				_resultArr.add(106);
+				_resultArr.add(_effectArg[0]);
+			}
+			
+			break;
 		}
 		
-//		switch(_effect){
-//		
-//			case 1:
-//				
-//				_targetHero.isSilent = true;
-//				
-//				_resultArr.add(1);
-//				_resultArr.add(0);
-//					
-//				return;
-//				
-//			case 2:
-//
-//				_targetHero.hpChange = _targetHero.hpChange + _effectArg[0];
-//				
-//				_resultArr.add(2);
-//				_resultArr.add(_effectArg[0]);
-//				
-//				return;
-//				
-//			case 3:
-//
-//				_targetHero.atkFix = _targetHero.atkFix + _effectArg[0];
-//				
-//				_resultArr.add(3);
-//				_resultArr.add(_effectArg[0]);
-//				
-//				return;
-//				
-//			case 4:
-//				
-//				_targetHero.maxHpFix = _targetHero.maxHpFix + _effectArg[0];
-//				
-//				_targetHero.hpChange = _targetHero.hpChange + _effectArg[0];
-//				
-//				_resultArr.add(4);
-//				_resultArr.add(_effectArg[0]);
-//				
-//				return;
-//				
-//			case 5:
-//				
-//				int damage = _targetHero.csv.atk + _effectArg[0];
-//				
-//				damage = damage > 0 ? 0 : damage;
-//				
-//				_targetHero.hpChange = _targetHero.hpChange + damage;
-//				
-//				_resultArr.add(2);
-//				_resultArr.add(damage);
-//				
-//				return;
-//				
-//			case 6:
-//				
-//				if(_targetHero.hp == _targetHero.csv.maxHp){
-//					
-//					_targetHero.hpChange = _targetHero.hpChange + _effectArg[0];
-//					
-//					_resultArr.add(2);
-//					_resultArr.add(_effectArg[0]);
-//					
-//					return ;
-//					
-//				}else{
-//					
-//					_targetHero.hpChange = _targetHero.hpChange + _effectArg[1];
-//					
-//					_resultArr.add(2);
-//					_resultArr.add(_effectArg[1]);
-//					
-//					return;
-//				}
-//				
-//			case 7:
-//				
-//				_hero.atkFix = _hero.atkFix + _targetHero.csv.atk;
-//				
-//				_resultArr.add(6);
-//				_resultArr.add(_targetHero.csv.atk);
-//				
-//				return;
-//				
-//			case 8:
-//				
-//				int data = _targetHero.csv.atk - _hero.csv.atk;
-//				
-//				_hero.atkFix = _hero.atkFix + data;
-//				
-//				_resultArr.add(6);
-//				_resultArr.add(data);
-//				
-//				return;
-//				
-//			case 9:
-//				
-//				_targetHero.hpChange = _targetHero.hpChange + _effectArg[0];
-//				
-//				_resultArr.add(2);
-//				_resultArr.add(_effectArg[0]);
-//				
-//				_hero.hpChange = _hero.hpChange + _effectArg[1];
-//				
-//				_resultArr.add(5);
-//				_resultArr.add(_effectArg[1]);
-//				
-//				return;
-//				
-//			default:
-//				
-//				return;
-//		}
 	}
 }
 

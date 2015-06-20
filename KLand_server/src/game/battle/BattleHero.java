@@ -19,7 +19,7 @@ public class BattleHero {
 	
 	public int atkFix = 0;
 	public int maxHpFix = 0;
-//	public float defFix = 1;
+	public float beAtkWeightFix = 1f;
 	
 	public int hpChange = 0;
 	public boolean hasLosePower = false;
@@ -32,5 +32,10 @@ public class BattleHero {
 	public int getMaxHp(){
 		
 		return csv.maxHp + maxHpFix;
+	}
+	
+	public int getHpWeight(){
+		
+		return (int)(csv.beAttackTargetWeight * beAtkWeightFix);
 	}
 }
