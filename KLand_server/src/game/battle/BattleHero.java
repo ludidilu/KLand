@@ -17,6 +17,8 @@ public class BattleHero {
 	public boolean moved = false;
 	public boolean isSilent = false;
 	
+	public boolean die = false;
+	
 	public int atkFix = 0;
 	public int maxHpFix = 0;
 	public float beAtkWeightFix = 1f;

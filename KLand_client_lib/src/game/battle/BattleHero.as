@@ -26,6 +26,7 @@ package game.battle
 		public var hpChange:int;
 		public var atkFix:int;
 		public var maxHpFix:int;
+		public var die:Boolean;
 		
 		private var frameImg:Image;
 		private var img:Image;

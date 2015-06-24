@@ -40,7 +40,8 @@ public class Battle extends SuperService{
 	
 	private static int START_CARDS_NUM = 4;
 	private static int MAX_CARDS_NUM = 5;
-	private static int MONEY = 5;
+	private static int MAX_MONEY = 5;
+	private static int START_MONEY = 3;
 	public static int POWER_CAN_MOVE = 2;
 	
 	private UserService service1;
@@ -439,7 +440,19 @@ public class Battle extends SuperService{
 		
 		if(service != null){
 			
-			money = MONEY;
+			if(actionState){
+				
+				money = START_MONEY + (nowRound - 1) / 2;
+				
+				if(money > MAX_MONEY){
+					
+					money = MAX_MONEY;
+				}
+				
+			}else{
+				
+				money = MAX_MONEY;
+			}
 			
 		}else{
 			
@@ -819,6 +832,13 @@ public class Battle extends SuperService{
 
 			BattleHero hero = iter.next();
 			
+			if(hero.die){
+				
+				iter.remove();
+				
+				continue;
+			}
+			
 			if(hero.hpChange != 0){
 			
 				hero.hp = hero.hp + hero.hpChange;
@@ -1103,6 +1123,8 @@ public class Battle extends SuperService{
 			}
 			
 			hero.atkFix = hero.maxHpFix = 0;
+			
+			hero.beAtkWeightFix = 1f;
 		}
 		
 		int cardUid = -1;

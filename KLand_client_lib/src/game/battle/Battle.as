@@ -38,8 +38,8 @@ package game.battle
 
 	public class Battle extends Sprite
 	{
-		public static const MAX_CARDS_NUM:int = 5;
 		public static const MONEY_NUM:int = 5;
+		public static const START_MONEY_NUM:int = 3;
 		public static const POWER_CAN_MOVE:int = 2;
 		
 		private static const CARD_WIDTH:int = 64;
@@ -356,7 +356,22 @@ package game.battle
 			
 			refreshUIContainer();
 			
-			money = MONEY_NUM;
+			if(!isActioned){
+			
+				if(isHost){
+					
+					money = START_MONEY_NUM + (nowRound - 1) * 0.5;
+					
+					if(money > MONEY_NUM){
+						
+						money = MONEY_NUM;
+					}
+					
+				}else{
+					
+					money = MONEY_NUM;
+				}
+			}
 			
 			refreshMoneyTf();
 			
@@ -421,8 +436,6 @@ package game.battle
 					hero.y = tmpBattleMapUnit.y;
 				}
 			}
-			
-			
 		}
 		
 		private function refreshCards():void{
@@ -1445,6 +1458,26 @@ package game.battle
 						
 						break;
 					
+					case 7:
+						
+						hero = heroData[_targetPos];
+						
+						hero.die = true;
+						
+						str = "Die";
+						color = 0xFF0000;
+						
+						tf = new TextField(tfWidth,tfHeight,str,ResourceFont.fontName,tfSize,color);
+						tf.hAlign = HAlign.CENTER;
+						tf.vAlign = VAlign.CENTER;
+						
+						tmpBattleMapUnit = battleMap.dic[_targetPos];
+						
+						tf.x = tmpBattleMapUnit.x - 0.5 * tf.width;
+						tf.y = tmpBattleMapUnit.y - 0.5 * tf.height - tfFix - tfVerticalGap * i;
+						
+						break;
+					
 					case 101:
 						
 						str = "Silent";
@@ -1599,6 +1632,26 @@ package game.battle
 						tf.y = tmpBattleMapUnit.y - 0.5 * tf.height - tfFix - tfVerticalGap * _index;
 						
 						break;
+					
+					case 107:
+						
+						hero = heroData[_pos];
+						
+						hero.die = true;
+						
+						str = "Die";
+						color = 0xFF0000;
+						
+						tf = new TextField(tfWidth,tfHeight,str,ResourceFont.fontName,tfSize,color);
+						tf.hAlign = HAlign.CENTER;
+						tf.vAlign = VAlign.CENTER;
+						
+						tmpBattleMapUnit = battleMap.dic[_pos];
+						
+						tf.x = tmpBattleMapUnit.x - 0.5 * tf.width;
+						tf.y = tmpBattleMapUnit.y - 0.5 * tf.height - tfFix - tfVerticalGap * _index;
+						
+						break;
 				}
 				
 				sp.addChild(tf);
@@ -1640,6 +1693,22 @@ package game.battle
 			for(var str:String in heroData){
 				
 				var hero:BattleHero = heroData[str];
+				
+				if(hero.die){
+					
+					if(!hasAddCallBack){
+						
+						hasAddCallBack = true;
+						
+						TweenLite.delayedCall(1,startAttack,[_attackData,_cardUid,_cardID]);
+					}
+					
+					TweenLite.to(hero,0.5,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[hero]});
+					
+					delete heroData[str];
+					
+					continue;
+				}
 				
 				if(hero.hpChange != 0){
 				
@@ -2181,11 +2250,28 @@ package game.battle
 			
 			refreshUIContainer();
 			
-			money = MONEY_NUM;
+			isActioned = !isActioned;
+			
+			if(!isActioned){
+				
+				if(isHost){
+					
+					money = START_MONEY_NUM + (nowRound - 1) * 0.5;
+					
+					if(money > MONEY_NUM){
+						
+						money = MONEY_NUM;
+					}
+					
+				}else{
+					
+					money = MONEY_NUM;
+				}
+			}
+			
+//			money = MONEY_NUM;
 			
 			refreshMoneyTf();
-		
-			isActioned = !isActioned;
 			
 			Starling.current.touchable = true;
 			
@@ -2226,7 +2312,16 @@ package game.battle
 		
 		private function refreshMoneyTf():void{
 			
-			myMoneyTf.text = "MyMoney:" + money;
+			if(!isActioned){
+			
+				myMoneyTf.text = "MyMoney:" + money;
+				
+				myMoneyTf.visible = true;
+				
+			}else{
+				
+				myMoneyTf.visible = false;
+			}
 		}
 		
 		public function showHeroDetail(_x:Number,_y:Number,_heroID:int):void{

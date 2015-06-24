@@ -1055,6 +1055,25 @@ public class BattlePublic {
 			}
 			
 			break;
+			
+		case 9:
+			
+			if(_effectTarget){
+				
+				_targetHero.die = true;
+				
+				_resultArr.add(7);
+				_resultArr.add(0);
+				
+			}else{
+				
+				_hero.die = true;
+				
+				_resultArr.add(107);
+				_resultArr.add(0);
+			}
+
+			break;
 		}
 		
 	}

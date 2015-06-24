@@ -22,7 +22,7 @@ public class BattleAI {
 		
 			BattleHero hero = entry.getValue();
 			
-			if(!hero.isHost && hero.power > Battle.POWER_CAN_MOVE && hero.csv.heroType.moveType != 0){
+			if(!hero.isHost && hero.power >= Battle.POWER_CAN_MOVE && hero.csv.heroType.moveType != 0){
 				
 				int pos = entry.getKey();
 				
@@ -165,6 +165,68 @@ public class BattleAI {
 				_moveData.put(pos, BattlePublic.getDirection(_mapUnit.mapWidth, pos, targetPos));
 			}
 		}
+		
+		checkMoveData(_heroMap,_moveData);
+	}
+	
+	private static void checkMoveData(HashMap<Integer,BattleHero> _heroMap,HashMap<Integer, Integer> _moveData){
+		
+		Iterator<Entry<Integer, Integer>> iter = _moveData.entrySet().iterator();
+		
+		while(iter.hasNext()){
+			
+			Entry<Integer, Integer> entry = iter.next();
+			
+			int pos = entry.getKey();
+			int target = entry.getValue();
+			
+			ArrayList<Integer> checkedArr = new ArrayList<>();
+			
+			checkedArr.add(pos);
+			
+			boolean result = checkNeedMove(pos, target, checkedArr, _heroMap, _moveData);
+			
+			if(result){
+				
+				iter.remove();
+			}
+		}
+	}
+	
+	private static boolean checkNeedMove(int _pos,int _target,ArrayList<Integer> _checkedArr,HashMap<Integer,BattleHero> _heroMap,HashMap<Integer, Integer> _moveData){
+		
+		if(_heroMap.containsKey(_target)){
+			
+			if(!_moveData.containsKey(_target)){
+				
+				return true;
+				
+			}else{
+				
+				int target = _moveData.get(_target);
+				
+				int result = _checkedArr.indexOf(target);
+				
+				if(result == 0){
+					
+					return false;
+					
+				}else if(result == -1){
+					
+					_checkedArr.add(_target);
+					
+					return checkNeedMove(_target,target,_checkedArr,_heroMap,_moveData);
+					
+				}else{
+					
+					return true;
+				}
+			}
+			
+		}else{
+		
+			return false;
+		}
 	}
 	
 	private static int getSummonPos(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Csv_hero> _summonData, Csv_hero _hero){
@@ -232,7 +294,7 @@ public class BattleAI {
 		}
 	}
 	
-	private static int getMovePos(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Csv_hero> _summonData, HashMap<Integer, BattleHero> _moveMap, BattleHero _hero, int _pos, ArrayList<Integer> _moveTargetPosArr){
+	private static int getMovePos(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, Integer> _map, HashMap<Integer, BattleHero> _heroMap, HashMap<Integer, Csv_hero> _summonData, HashMap<Integer, BattleHero> _canMoveHeroMap, BattleHero _hero, int _pos, ArrayList<Integer> _moveTargetPosArr){
 		
 		String str = "move result:" + _pos + "\n";
 		
@@ -260,9 +322,13 @@ public class BattleAI {
 							
 						}else{
 							
-							if(!_moveMap.containsKey(pos)){
+							if(!_canMoveHeroMap.containsKey(pos)){
 								
 								continue;
+								
+							}else{
+								
+								
 							}
 						}
 					}
@@ -315,19 +381,9 @@ public class BattleAI {
 		
 		int tmpScore = 0;
 		
-		int damage = willBeHit(_neighbourPosMap, _heroMap, _pos);
+		int damage = willBeHit(_neighbourPosMap, _heroMap, _pos, _hero.maxHp, _hero.star);
 			
-		if(damage > 0){
-			
-			if(damage >= _hero.maxHp){
-				
-				tmpScore = tmpScore - _hero.maxHp * _hero.star * 2;
-				
-			}else{
-				
-				tmpScore = tmpScore - damage * _hero.star;
-			}
-		}
+		tmpScore = tmpScore - damage;
 		
 		int damageWithoutMove = canHitEnemy(_neighbourPosMap, _heroMap, _hero, _pos);
 		
@@ -335,11 +391,11 @@ public class BattleAI {
 			
 			if(_hero.heroType.moveType == 2){
 			
-				tmpScore = tmpScore + damageWithoutMove * 2;
+				tmpScore = tmpScore + damageWithoutMove;
 				
 			}else{
 				
-				tmpScore = tmpScore + damageWithoutMove;
+				tmpScore = tmpScore + damageWithoutMove / 2;
 			}
 		}
 		
@@ -377,12 +433,12 @@ public class BattleAI {
 			
 			if(hasEnemyPos){
 				
-				tmpScore = tmpScore + 10;
+				tmpScore = tmpScore + 5;
 			}
 			
 			if(damageWithoutMove == 0 && hasHitEnemy > 0){
 				
-				tmpScore = tmpScore + hasHitEnemy;
+				tmpScore = tmpScore + hasHitEnemy / 4;
 			}
 		}
 		
@@ -404,16 +460,9 @@ public class BattleAI {
 			
 		score = score + damage;
 		
-		damage = willBeHit(_neighbourPosMap, _heroMap, _pos);
+		damage = willBeHit(_neighbourPosMap, _heroMap, _pos,_hero.hp,_hero.csv.star);
 			
-		if(damage >= _hero.hp){
-			
-			score = score - _hero.hp * _hero.csv.star * 2;
-			
-		}else{
-			
-			score = score - damage * _hero.csv.star;
-		}
+		score = score - damage;
 		
 		return score;
 	}
@@ -448,7 +497,7 @@ public class BattleAI {
 				
 				if(targetHero != null && targetHero.isHost){
 					
-					if(targetHero.hp >= atk){
+					if(targetHero.hp > atk){
 						
 						damage = damage + atk * targetHero.csv.star;
 						
@@ -456,7 +505,7 @@ public class BattleAI {
 						
 					}else{
 						
-						damage = damage + targetHero.hp * targetHero.csv.star * 2;
+						damage = damage + targetHero.hp * targetHero.csv.star;
 						
 						atk = atk - targetHero.hp;
 					}
@@ -485,7 +534,7 @@ public class BattleAI {
 							
 							if(targetHero.isHost){
 								
-								if(targetHero.hp >= atk){
+								if(targetHero.hp > atk){
 									
 									damage = damage + atk * targetHero.csv.star;
 									
@@ -493,7 +542,7 @@ public class BattleAI {
 									
 								}else{
 									
-									damage = damage + targetHero.hp * targetHero.csv.star * 2;
+									damage = damage + targetHero.hp * targetHero.csv.star;
 									
 									atk = atk - targetHero.hp;
 								}
@@ -510,10 +559,10 @@ public class BattleAI {
 			}
 		}
 		
-		return damage;
+		return damage * 3;
 	}
 	
-	private static int willBeHit(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, BattleHero> _heroMap, int _pos){
+	private static int willBeHit(HashMap<Integer, int[]> _neighbourPosMap, HashMap<Integer, BattleHero> _heroMap, int _pos ,int _hp, int _star){
 		
 		int damage = 0;
 		
@@ -562,6 +611,15 @@ public class BattleAI {
 					lineAttack = false;
 				}
 			}
+		}
+		
+		if(damage >= _hp){
+			
+			damage = _hp * _star * 3;
+			
+		}else{
+			
+			damage = damage * _star;
 		}
 		
 		return damage;

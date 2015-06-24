@@ -174,37 +174,38 @@ package game.battle
 			
 			var dis:int = _target - _pos;
 			
-			switch(dis){
+			if(dis % _mapWidth == 0){
 				
-				case 1:
-				case 2:
-					
-					return 1;
-					
-				case -1:
-				case -2:
-					
-					return 4;
-					
-				case -_mapWidth:
-				case -2 * _mapWidth:
-					
-					return 5;
-					
-				case -_mapWidth + 1:
-				case -2 * _mapWidth + 2:
-					
-					return 0;
-					
-				case _mapWidth:
-				case 2 * _mapWidth:
+				if(dis > 0){
 					
 					return 2;
 					
-				default:
+				}else{
+					
+					return 5;
+				}
+				
+			}else if(dis % (_mapWidth - 1) == 0){
+				
+				if(dis > 0){
 					
 					return 3;
-						
+					
+				}else{
+					
+					return 0;
+				}
+				
+			}else{
+				
+				if(dis > 0){
+					
+					return 1;
+					
+				}else{
+					
+					return 4;
+				}
 			}
 		}
 	}
