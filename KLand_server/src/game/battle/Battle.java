@@ -107,9 +107,9 @@ public class Battle extends SuperService{
 			
 			maxRound = csv_battle.roundNum;
 			
-			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heros,csv_battle.cardsNum);
+			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heroData.heros,csv_battle.cardsNum);
 			
-			userAllCards2 = PublicTools.getSomeOfArr(service2.userData.heros,csv_battle.cardsNum);
+			userAllCards2 = PublicTools.getSomeOfArr(service2.userData.heroData.heros,csv_battle.cardsNum);
 			
 		}else{
 			
@@ -121,7 +121,7 @@ public class Battle extends SuperService{
 			
 			maxRound = csv_battleAi.roundNum;
 			
-			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heros,csv_battleAi.cardsNum);
+			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heroData.heros,csv_battleAi.cardsNum);
 			
 			Csv_ai csv_ai = Csv_ai.dic.get(_aiID);
 			

@@ -6,7 +6,7 @@ package game.gameQueue
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	
-	import publicTools.connect.Connect_handle;
+	import connect.Connect;
 	
 	import starling.core.Starling;
 
@@ -83,11 +83,11 @@ package game.gameQueue
 			
 			if(!isWaitting){
 				
-				Connect_handle.sendData(4);
+				Connect.sendData(4,enterQueueOK);
 				
 			}else{
 				
-				Connect_handle.sendData(6);
+				Connect.sendData(6,quitQueueOK);
 			}
 		}
 		
@@ -122,11 +122,11 @@ package game.gameQueue
 			
 			if(!isWaitting2){
 				
-				Connect_handle.sendData(14);
+				Connect.sendData(14,fightAiOK);
 				
 			}else{
 				
-				Connect_handle.sendData(16);
+				Connect.sendData(16,quitAiOK);
 			}
 		}
 		

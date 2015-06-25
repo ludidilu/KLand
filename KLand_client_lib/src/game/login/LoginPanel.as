@@ -8,7 +8,9 @@ package game.login
 	import flash.text.TextFormat;
 	import flash.text.TextFormatAlign;
 	
-	import publicTools.connect.Connect_handle;
+	import connect.Connect;
+	
+	import game.Game;
 	
 	import starling.core.Starling;
 	
@@ -79,7 +81,7 @@ package game.login
 		
 		private function click(e:MouseEvent):void{
 			
-			Connect_handle.sendData(0,nameText.text,pwdText.text);
+			Connect.sendData(0,Game.loginOK,nameText.text,pwdText.text);
 		}
 		
 		public function loginFail():void{

@@ -1,7 +1,6 @@
 package data.dataDB;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 
 import userService.UserService;
 import data.dataDB.user.DB_user;
@@ -27,15 +26,13 @@ public class MainDB {
         	
         	UserService service = (UserService)user.service;
         	
-        	service.userData.heros = new ArrayList<>();
-        	
         	if(!herosStr.equals("")){
         	
 	        	String[] tmpStrVec = herosStr.split("\\$");
 	        	
 	        	for(int i = 0 ; i < tmpStrVec.length ; i++){
 	        		
-	        		service.userData.heros.add(Integer.parseInt(tmpStrVec[i]));
+	        		service.userData.heroData.heros.add(Integer.parseInt(tmpStrVec[i]));
 	        	}
         	}
         }

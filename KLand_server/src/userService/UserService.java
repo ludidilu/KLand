@@ -1,5 +1,6 @@
 package userService;
 
+import playerData.PlayerData;
 import game.battle.Battle;
 import game.gameAi.GameAi;
 import game.gameQueue.GameQueue;
@@ -29,7 +30,7 @@ public class UserService extends Server_thread_service{
 		Server_thread_service.methodMap.put("leaveBattle", UserService.class.getDeclaredMethod("leaveBattle",int.class));
 	}
 	
-	public UserData userData;
+	public PlayerData userData;
 	
 	private Battle battle;
 	
@@ -41,7 +42,7 @@ public class UserService extends Server_thread_service{
 		
 		super(_user);
 		
-		userData = new UserData();
+		userData = new PlayerData();
 	}
 	
 	public void kick(Server_thread _thread) throws Exception{
@@ -76,6 +77,18 @@ public class UserService extends Server_thread_service{
 		super.disconnect();
 	}
 	
+	public void sendData(int _id,Object... objVec) throws Exception{
+		
+		String syncData = userData.getSyncData();
+		
+		if(syncData != null){
+			
+			super.sendData(1000, syncData);
+		}
+		
+		super.sendData(_id, objVec);
+	}
+	
 	public void sendMsg(String _str) throws Exception{
 		
 		sendData(999, _str);
@@ -83,14 +96,7 @@ public class UserService extends Server_thread_service{
 	
 	public void getUserData() throws Exception{
 		
-		int[] heros = new int[userData.heros.size()];
-		
-		for(int i = 0 ; i < userData.heros.size() ; i++){
-			
-			heros[i] = userData.heros.get(i);
-		}
-		
-		sendData(3, battle != null, (Object)heros);
+		sendData(3, battle != null, userData.getAllData());
 	}
 	
 	public void enterQueue() throws Exception{

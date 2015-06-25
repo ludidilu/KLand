@@ -2,11 +2,12 @@
 id,methodName,arg,type,comment
 int,str,str[],int,str
 999,pushMsg,str,2,服务器主动推送信息
+1000,syncData,str,2,同步玩家数据
 -1,logout,,2,被踢下线
 0,login,str$str,0,登录
 1,loginOK,boo,1,登录是否成功
 2,getUserData,,0,申请获取玩家数据
-3,getUserDataOK,boo$int[],1,获取玩家数据成功
+3,getUserDataOK,boo$str,1,获取玩家数据成功
 4,enterQueue,,0,申请加入战斗队列
 5,enterQueueOK,boo,1,加入战斗队列成功
 6,quitQueue,,0,申请离开战斗队列

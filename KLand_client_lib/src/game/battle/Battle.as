@@ -10,6 +10,8 @@ package game.battle
 	import flash.geom.Rectangle;
 	import flash.utils.Dictionary;
 	
+	import connect.Connect;
+	
 	import csv.Csv;
 	
 	import data.csv.Csv_hero;
@@ -20,7 +22,7 @@ package game.battle
 	
 	import game.Game;
 	
-	import publicTools.connect.Connect_handle;
+	import playerData.PlayerData;
 	
 	import starling.core.Starling;
 	import starling.display.Button;
@@ -956,7 +958,7 @@ package game.battle
 				summonData.push(Vector.<int>([card.uid, pos]));
 			}
 			
-			Connect_handle.sendData(11,moveData,summonData);
+			Connect.sendData(11,playBattle,moveData,summonData);
 		}
 		
 		public function playBattle(_summonData:Vector.<Vector.<int>>,_moveData:Vector.<Vector.<int>>,_skillData:Vector.<Vector.<Vector.<int>>>,_attackData:Vector.<Vector.<Vector.<int>>>,_cardUid:int,_cardID:int):void{
@@ -2408,7 +2410,15 @@ package game.battle
 		
 		private function quitBattle(e:Event):void{
 			
-			Connect_handle.sendData(18);
+			Connect.sendData(18,quitBattleOK);
+		}
+		
+		private function quitBattleOK(_result:Boolean):void{
+			
+			if(_result){
+				
+				leaveBattle(-1);
+			}
 		}
 		
 		public function leaveBattle(_result:int):void{

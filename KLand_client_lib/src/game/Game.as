@@ -2,11 +2,13 @@ package game
 {
 	import flash.display.Stage;
 	
+	import connect.Connect;
+	
 	import game.battle.Battle;
 	import game.gameQueue.GameQueuePanel;
 	import game.login.LoginPanel;
 	
-	import publicTools.connect.Connect_handle;
+	import playerData.PlayerData;
 	
 	import starling.core.Starling;
 
@@ -22,6 +24,8 @@ package game
 		}
 		
 		public static function init(_stage:Stage):void{
+			
+			new PlayerData;
 			
 			stage = _stage;
 		}
@@ -39,7 +43,7 @@ package game
 			
 			if(_boolean){
 				
-				Connect_handle.sendData(2);
+				Connect.sendData(2,getUserData);
 				
 			}else{
 				
@@ -47,9 +51,24 @@ package game
 			}
 		}
 		
-		public static function getUserData(_isInBattle:Boolean,_heros:Vector.<int>):void{
+		public static function syncData(_str:String):void{
+			
+			var data:Object = JSON.parse(_str);
+			
+			PlayerData.instance.sync(data);
+			
+			var ss:PlayerData = PlayerData.instance;
+		}
+		
+		public static function getUserData(_isInBattle:Boolean,_playerData:String):void{
 			
 			stage.removeChild(loginPanel);
+			
+			var data:Object = JSON.parse(_playerData);
+			
+			PlayerData.instance.sync(data);
+			
+			var ss:PlayerData = PlayerData.instance;
 			
 			if(!_isInBattle){
 			
@@ -61,26 +80,6 @@ package game
 			}
 		}
 		
-		public static function enterQueueOK(_b:Boolean):void{
-			
-			gameQueuePanel.enterQueueOK(_b);
-		}
-		
-		public static function quitQueueOK(_b:Boolean):void{
-			
-			gameQueuePanel.quitQueueOK(_b);
-		}
-		
-		public static function fightAiOK(_b:Boolean):void{
-			
-			gameQueuePanel.fightAiOK(_b);
-		}
-		
-		public static function quitAiOK(_b:Boolean):void{
-			
-			gameQueuePanel.quitAiOK(_b);
-		}
-		
 		public static function enterBattle():void{
 			
 			if(gameQueuePanel.parent != null){
@@ -90,7 +89,7 @@ package game
 				stage.removeChild(gameQueuePanel);
 			}
 			
-			Connect_handle.sendData(9);
+			Connect.sendData(9,getBattleData);
 		}
 		
 		public static function getBattleData(_isHost:Boolean,_nowRound:int,_maxRound:int,_mapID:int,_mapData:Vector.<int>,_myCards:Vector.<Vector.<int>>,_oppCardsNum:int,_userAllCardsNum1:int,_userAllCardsNum2:int,_heroData:Vector.<Vector.<int>>,_isActioned:Boolean):void{
