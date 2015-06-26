@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import playerData.PlayerData;
 import publicTools.PublicTools;
 import superService.SuperService;
 import userService.UserService;
@@ -107,9 +108,13 @@ public class Battle extends SuperService{
 			
 			maxRound = csv_battle.roundNum;
 			
-			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heroData.heros,csv_battle.cardsNum);
+			PlayerData playerData = (PlayerData)service1.user.userData;
 			
-			userAllCards2 = PublicTools.getSomeOfArr(service2.userData.heroData.heros,csv_battle.cardsNum);
+			userAllCards1 = PublicTools.getSomeOfArr(playerData.heroData.heros,csv_battle.cardsNum);
+			
+			playerData = (PlayerData)service2.user.userData;
+			
+			userAllCards2 = PublicTools.getSomeOfArr(playerData.heroData.heros,csv_battle.cardsNum);
 			
 		}else{
 			
@@ -121,7 +126,9 @@ public class Battle extends SuperService{
 			
 			maxRound = csv_battleAi.roundNum;
 			
-			userAllCards1 = PublicTools.getSomeOfArr(service1.userData.heroData.heros,csv_battleAi.cardsNum);
+			PlayerData playerData = (PlayerData)service1.user.userData;
+			
+			userAllCards1 = PublicTools.getSomeOfArr(playerData.heroData.heros,csv_battleAi.cardsNum);
 			
 			Csv_ai csv_ai = Csv_ai.dic.get(_aiID);
 			

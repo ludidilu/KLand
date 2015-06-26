@@ -1,6 +1,5 @@
 package userService;
 
-import playerData.PlayerData;
 import game.battle.Battle;
 import game.gameAi.GameAi;
 import game.gameQueue.GameQueue;
@@ -30,7 +29,7 @@ public class UserService extends Server_thread_service{
 		Server_thread_service.methodMap.put("leaveBattle", UserService.class.getDeclaredMethod("leaveBattle",int.class));
 	}
 	
-	public PlayerData userData;
+//	public PlayerData userData;
 	
 	private Battle battle;
 	
@@ -41,8 +40,6 @@ public class UserService extends Server_thread_service{
 	public UserService(DB_user_unit _user){
 		
 		super(_user);
-		
-		userData = new PlayerData();
 	}
 	
 	public void kick(Server_thread _thread) throws Exception{
@@ -79,7 +76,7 @@ public class UserService extends Server_thread_service{
 	
 	public void sendData(int _id,Object... objVec) throws Exception{
 		
-		String syncData = userData.getSyncData();
+		String syncData = user.userData.getSyncData();
 		
 		if(syncData != null){
 			
@@ -96,7 +93,7 @@ public class UserService extends Server_thread_service{
 	
 	public void getUserData() throws Exception{
 		
-		sendData(3, battle != null, userData.getAllData());
+		sendData(3, battle != null, user.userData.getAllData());
 	}
 	
 	public void enterQueue() throws Exception{
