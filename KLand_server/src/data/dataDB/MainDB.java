@@ -5,8 +5,8 @@ import userService.UserService;
 
 public class MainDB {
 
-	public static void init(String _DBName,String _userName,String _password) throws Exception{
+	public static void init(String _path,int _port) throws Exception{
 		
-		DB.init("localhost",6379,UserService.class,PlayerData.class);
+		DB.init(_path,_port,UserService.class,PlayerData.class);
 	}
 }

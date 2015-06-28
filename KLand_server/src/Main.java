@@ -20,7 +20,7 @@ public class Main {
 		
 		Map.init("C:/inetpub/wwwroot/KLand/data/map/");
 		
-		MainDB.init("KLand","root","616097");
+		MainDB.init("localhost",6379);
 		
 		UserService.init();
 		
