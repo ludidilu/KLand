@@ -11,8 +11,6 @@ import data.dataCsv.map.Csv_map;
 
 public class MainCsv {
 
-//	private static String path = "C:/inetpub/wwwroot/KLand/data/csv/";
-	
 	public static void init(String _path) throws Exception{
 		
 		Csv.init(_path,UserService.class);
