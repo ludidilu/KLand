@@ -7,8 +7,8 @@ package data.csv
 		public static const NAME:String = "heroType";
 		
 		public var name:String;
-		public var attackType:int;
-		public var attackRange:int;
+		public var minAttackRange:int;
+		public var maxAttackRange:int;
 		public var moveType:int;
 	}
 }

@@ -22,8 +22,6 @@ package game.battle
 	
 	import game.Game;
 	
-	import playerData.PlayerData;
-	
 	import starling.core.Starling;
 	import starling.display.Button;
 	import starling.display.Image;
@@ -40,6 +38,7 @@ package game.battle
 
 	public class Battle extends Sprite
 	{
+		public static const POWER_RECOVER_HP:Boolean = false;
 		public static const MONEY_NUM:int = 5;
 		public static const START_MONEY_NUM:int = 3;
 		public static const POWER_CAN_MOVE:int = 2;
@@ -2137,7 +2136,7 @@ package game.battle
 					hero.maxHpFix = 0;
 				}
 				
-				if(hero.hp < hero.csv.maxHp && hero.power > 0){
+				if(POWER_RECOVER_HP && hero.hp < hero.csv.maxHp && hero.power > 0){
 					
 					hero.hp = hero.hp + hero.power;
 					

@@ -9,7 +9,7 @@ public class Csv_heroType extends Csv{
 	public static HashMap<Integer, Csv_heroType> dic = new HashMap<>();
 
 	public boolean canAttack;
-	public int attackType;
-	public int attackRange;
+	public int minAttackRange;
+	public int maxAttackRange;
 	public int moveType;
 }

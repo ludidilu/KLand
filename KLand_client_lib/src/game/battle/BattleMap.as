@@ -643,50 +643,31 @@ package game.battle
 		
 		private function showTargetFrame(_hero:BattleHero):void{
 			
-			if(_hero.csv.heroType.attackType == 1){
+			loop:for(var i:int = 0 ; i < 6 ; i++){
 				
-				loop1:for(var i:int = 0 ; i < 6 ; i++){
+				var nowPos:int = _hero.pos;
+				
+				for(var m:int = 1 ; m <= _hero.csv.heroType.maxAttackRange ; m++){
 					
-					var nowPos:int = _hero.pos;
+					var pos:int = mapUnit.neightbourDic[nowPos][i];
 					
-					for(var m:int = 0 ; m < _hero.csv.heroType.attackRange ; m++){
+					if(pos == -1){
 						
-						var pos:int = mapUnit.neightbourDic[nowPos][i];
+						continue loop;
 						
-						if(pos == -1){
-							
-							continue loop1;
-							
-						}else{
+					}else{
+						
+						if(m < _hero.csv.heroType.minAttackRange){
 							
 							nowPos = pos;
-						}
-					}
-					
-					checkAddFrame(_hero,nowPos);
-				}
-					
-			}else if(_hero.csv.heroType.attackType == 2){
-				
-				loop2:for(i = 0 ; i < 6 ; i++){
-					
-					nowPos = _hero.pos;
-					
-					for(m = 0 ; m < _hero.csv.heroType.attackRange ; m++){
-						
-						pos = mapUnit.neightbourDic[nowPos][i];
-						
-						if(pos == -1){
-							
-							continue loop2;
 							
 						}else{
 							
-							var result:Boolean = checkAddFrame(_hero,pos);
+							var result:Boolean = checkAddFrame(_hero,nowPos);
 							
 							if(result){
 								
-								continue loop2;
+								continue loop;
 								
 							}else{
 								

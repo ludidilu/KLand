@@ -313,82 +313,26 @@ public class BattlePublic {
 	//type 0所有 1敌方 2友方
 	public static void getHerosAndDirectionInRange(HashMap<Integer, int[]> _neighbourPosMap,HashMap<Integer, BattleHero> _heroDic,BattleHero _hero,int _type,ArrayList<BattleHero> _heroArr, ArrayList<Integer> _directionArr){
 		
-		if(_hero.csv.heroType.attackType == 1){
+		loop:for(int i = 0 ; i < 6 ; i++){
 			
-			loop1:for(int i = 0 ; i < 6 ; i++){
+			int nowPos = _hero.pos;
+			
+			for(int m = 1 ; m <= _hero.csv.heroType.maxAttackRange ; m++){
 				
-				int nowPos = _hero.pos;
+				int pos = _neighbourPosMap.get(nowPos)[i];
 				
-				for(int m = 0 ; m < _hero.csv.heroType.attackRange ; m++){
+				if(pos == -1){
 					
-					int pos = _neighbourPosMap.get(nowPos)[i];
+					continue loop;
 					
-					if(pos == -1){
-						
-						continue loop1;
-						
-					}else{
+				}else{
+					
+					if(m < _hero.csv.heroType.minAttackRange){
 						
 						nowPos = pos;
-					}
-				}
-				
-				BattleHero targetHero = _heroDic.get(nowPos);
-				
-				if(targetHero != null){
-					
-					if(_type == 0){
-						
-						_heroArr.add(targetHero);
-						
-						if(_directionArr != null){
-						
-							_directionArr.add(i);
-						}
-						
-					}else if(_type == 1){
-						
-						if(targetHero.isHost != _hero.isHost){
-							
-							_heroArr.add(targetHero);
-							
-							if(_directionArr != null){
-								
-								_directionArr.add(i);
-							}
-						}
 						
 					}else{
-						
-						if(targetHero.isHost == _hero.isHost){
-							
-							_heroArr.add(targetHero);
-							
-							if(_directionArr != null){
-								
-								_directionArr.add(i);
-							}
-						}
-					}
-				}
-			}
-		
-		}else if(_hero.csv.heroType.attackType == 2){
-			
-			loop2:for(int i = 0 ; i < 6 ; i++){
-				
-				int nowPos = _hero.pos;
-				
-				for(int m = 0 ; m < _hero.csv.heroType.attackRange ; m++){
 					
-					int pos = _neighbourPosMap.get(nowPos)[i];
-					
-					if(pos == -1){
-						
-						continue loop2;
-						
-					}else{
-						
 						BattleHero targetHero = _heroDic.get(pos);
 						
 						if(targetHero != null){
@@ -427,7 +371,7 @@ public class BattlePublic {
 								}
 							}
 							
-							continue loop2;
+							continue loop;
 							
 						}else{
 							

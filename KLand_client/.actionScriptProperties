@@ -32,6 +32,7 @@
       </libraryPathEntry>
       <libraryPathEntry kind="3" linkType="1" path="/PublicTools/bin/PublicTools.swc" useDefaultLinkType="false"/>
       <libraryPathEntry kind="3" linkType="1" path="/KLand_lib/bin/KLand_lib.swc" useDefaultLinkType="false"/>
+      <libraryPathEntry kind="3" linkType="1" path="/Starling1.6/bin/Starling1.6.swc" useDefaultLinkType="false"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
@@ -49,6 +50,10 @@
       <airSettings airCertificatePath="" airTimestamp="true" anePathSet="true" version="1">
         <airExcludes/>
         <anePaths/>
+        <newLaunchParams/>
+        <modifiedLaunchParams/>
+        <newPackagingParams/>
+        <modifiedPackagingParams/>
       </airSettings>
       <actionScriptSettings version="1"/>
     </buildTarget>

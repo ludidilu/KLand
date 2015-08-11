@@ -16,9 +16,9 @@ public class Main {
 		
 		Server.init();
 		
-		MainCsv.init("C:/inetpub/wwwroot/KLand/data/csv/");
+		MainCsv.init("K:/inetpub/wwwroot/KLand/data/csv/");
 		
-		Map.init("C:/inetpub/wwwroot/KLand/data/map/");
+		Map.init("K:/inetpub/wwwroot/KLand/data/map/");
 		
 		MainDB.init("localhost",6379);
 		

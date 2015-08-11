@@ -10,7 +10,7 @@ package data
 
 	public class Data
 	{
-		public static const path:String = "c:/inetpub/wwwroot/KLand/data/";
+		public static const path:String = "K:/inetpub/wwwroot/KLand/data/";
 		private static const csvPath:String = "csv/";
 		
 		private static var callBack:Function;

@@ -39,6 +39,7 @@ public class Battle extends SuperService{
 		return methodMap;
 	}
 	
+	private static boolean POWER_RECOVER_HP = false;
 	private static int START_CARDS_NUM = 4;
 	private static int MAX_CARDS_NUM = 5;
 	private static int MAX_MONEY = 5;
@@ -1090,7 +1091,7 @@ public class Battle extends SuperService{
 				hero.maxHpFix = 0;
 			}
 			
-			if(hero.hp < hero.csv.maxHp && hero.power > 0){
+			if(POWER_RECOVER_HP && hero.hp < hero.csv.maxHp && hero.power > 0){
 				
 				hero.hp = hero.hp + hero.power;
 				
