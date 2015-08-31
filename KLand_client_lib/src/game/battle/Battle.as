@@ -15,6 +15,7 @@ package game.battle
 	import csv.Csv;
 	
 	import data.csv.Csv_hero;
+	import data.csv.Csv_map;
 	import data.map.Map;
 	import data.map.MapUnit;
 	import data.resource.ResourceFont;
@@ -38,7 +39,7 @@ package game.battle
 
 	public class Battle extends Sprite
 	{
-		public static const POWER_RECOVER_HP:Boolean = false;
+		public static const POWER_RECOVER_HP:Boolean = true;
 		public static const MONEY_NUM:int = 5;
 		public static const START_MONEY_NUM:int = 3;
 		public static const POWER_CAN_MOVE:int = 2;
@@ -337,7 +338,9 @@ package game.battle
 				}
 			}
 			
-			battleMap.start(mapUnit,mapData);
+			var csvMap:Csv_map = Csv.getData(Csv_map.NAME,_mapID) as Csv_map;
+			
+			battleMap.start(mapUnit,mapData,csvMap.flipType);
 			
 			gameContainer.x = (Starling.current.backBufferWidth - battleMap.mapContainer.width * gameContainerScale) * 0.5;
 			gameContainer.y = (Starling.current.backBufferHeight - battleMap.mapContainer.height * gameContainerScale - 80) * 0.5;
@@ -1708,6 +1711,19 @@ package game.battle
 					
 					delete heroData[str];
 					
+					if(hero.isMine){
+						
+						oppScore++;
+						
+						myScore--;
+						
+					}else{
+						
+						myScore++;
+						
+						oppScore--;
+					}
+					
 					continue;
 				}
 				
@@ -1727,6 +1743,19 @@ package game.battle
 						TweenLite.to(hero,0.5,{alpha:0,ease:Linear.easeNone,onComplete:spriteAlphaOutOver,onCompleteParams:[hero]});
 						
 						delete heroData[str];
+						
+						if(hero.isMine){
+							
+							oppScore++;
+							
+							myScore--;
+							
+						}else{
+							
+							myScore++;
+							
+							oppScore--;
+						}
 						
 						continue;
 					}
@@ -1760,8 +1789,11 @@ package game.battle
 			if(!hasAddCallBack){
 				
 				TweenLite.delayedCall(0.5,startAttack,[_attackData,_cardUid,_cardID]);
+				
+			}else{
+				
+				refreshUIContainer();
 			}
-			
 		}
 		
 		private function spriteAlphaOutOver(_sp:Sprite):void{
@@ -2113,6 +2145,19 @@ package game.battle
 						
 						delete heroData[str];
 						
+						if(hero.isMine){
+							
+							oppScore++;
+							
+							myScore--;
+							
+						}else{
+							
+							myScore++;
+							
+							oppScore--;
+						}
+						
 						continue;
 					}
 				
@@ -2165,6 +2210,10 @@ package game.battle
 			if(!hasAddCallBack){
 				
 				TweenLite.delayedCall(0.5,resetData,[_beHitDic,_cardUid,_cardID]);
+				
+			}else{
+				
+				refreshUIContainer();
 			}
 		}
 		

@@ -74,7 +74,7 @@ package game.battle
 				img.x = 10;
 				img.y = 10;
 				
-				nameTf = new TextField(60,30,heroCsv.name,ResourceFont.fontName,24);
+				nameTf = new TextField(60,30,String(heroCsv.id),ResourceFont.fontName,24);
 				
 				nameTf.hAlign = HAlign.LEFT;
 				nameTf.vAlign = VAlign.TOP;
@@ -150,7 +150,7 @@ package game.battle
 				
 				img.texture = ResourceHero.getTexture(heroCsv.picName);
 				
-				nameTf.text = heroCsv.name;
+				nameTf.text = String(heroCsv.id);
 				
 				typeTf.text = heroCsv.heroType.name;
 				

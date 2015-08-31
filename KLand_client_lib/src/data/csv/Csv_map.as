@@ -7,5 +7,6 @@ package data.csv
 		public static const NAME:String = "map";
 		
 		public var name:String;
+		public var flipType:int;//地图翻转类型(0不翻转 1水平翻转 2中心翻转)
 	}
 }

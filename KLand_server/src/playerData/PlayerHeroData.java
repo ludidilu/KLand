@@ -12,8 +12,9 @@ public class PlayerHeroData extends UserDataUnit{
 		
 		heros = new ArrayList<>();
 		
-		heros.add(1);
-		heros.add(2);
-		heros.add(3);
+		for(int i = 0 ; i < 40 ; i++){
+			
+			heros.add(i + 1);
+		}
 	}
 }

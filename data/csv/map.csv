@@ -1,8 +1,8 @@
-//编号,名字
-id,name
-int,str
-1,aaa.map
-2,bbb.map
-3,ccc.map
-4,ddd.map
-5,ai1.map
+//编号,名字,翻转类型(0不翻转 1水平翻转 2中心翻转)
+id,name,flipType
+int,str,int
+1,aaa.map,2
+2,bbb.map,2
+3,ccc.map,2
+4,ddd.map,1
+5,ai1.map,2

@@ -39,7 +39,7 @@ public class Battle extends SuperService{
 		return methodMap;
 	}
 	
-	private static boolean POWER_RECOVER_HP = false;
+	private static boolean POWER_RECOVER_HP = true;
 	private static int START_CARDS_NUM = 4;
 	private static int MAX_CARDS_NUM = 5;
 	private static int MAX_MONEY = 5;
@@ -844,6 +844,15 @@ public class Battle extends SuperService{
 				
 				iter.remove();
 				
+				if(hero.isHost){
+					
+					score2++;
+					
+				}else{
+					
+					score1++;
+				}
+				
 				continue;
 			}
 			
@@ -854,6 +863,15 @@ public class Battle extends SuperService{
 				if(hero.hp < 1){
 					
 					iter.remove();
+					
+					if(hero.isHost){
+						
+						score2++;
+						
+					}else{
+						
+						score1++;
+					}
 					
 					continue;
 				}
@@ -1067,6 +1085,15 @@ public class Battle extends SuperService{
 //					service1.process("sendMsg", hero.pos + "die!!!");
 					
 					iter.remove();
+					
+					if(hero.isHost){
+						
+						score2++;
+						
+					}else{
+						
+						score1++;
+					}
 					
 					continue;
 				}

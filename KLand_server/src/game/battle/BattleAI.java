@@ -385,6 +385,8 @@ public class BattleAI {
 		
 		int damage = willBeHit(_neighbourPosMap, _heroMap, _summonData, _pos, _hero.maxHp, _hero.star);
 			
+		System.out.println("getSummonPosScore  pos:" + _pos + "  damage:" + damage);
+		
 		tmpScore = tmpScore - damage;
 		
 		int damageWithoutMove = canHitEnemy(_neighbourPosMap, _heroMap, _summonData, _hero, _pos);
